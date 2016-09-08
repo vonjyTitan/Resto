@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+	
+ 
+<struts>
+<bean type="org.apache.struts2.dispatcher.mapper.ActionMapper" name="myActionMapper" class="com.mapper.CustomActionMapper" />
+    <constant name="struts.mapper.class" value="myActionMapper" />
+    <constant name="struts.convention.action.suffix" value="Api"/>
+    <constant name="struts.convention.action.mapAllMatches" value="true"/>
+    <constant name="struts.convention.default.parent.package" value="rest-default"/>
+    <constant name="struts.convention.package.locators" value="rest"/>
+    <constant name="struts.action.extension" value="xhtml,,xml,json,action"/>
+	<constant name="struts.rest.content.restrictToGET" value="false"/> 
+    <constant name="struts.i18n.encoding" value="UTF-8"/> 
+
+<constant name="struts.multipart.maxSize" value="10000000000" />
+
+<!-- begin mapping api -->
+<package name="apiv1" namespace="/api/v1" extends="rest-default">
+</package>
+<package name="apiv2" namespace="/api/v2" extends="rest-default">
+</package>
+<!-- end api mapping -->
+
+<!-- test action begin -->
+
+<package name="bo" extends="struts-default" namespace="/">
+    <!-- 
+    <action name="index">
+            <result >/index.jsp</result>
+      </action>
+      -->
+<action name="testLogin" class="action.LoginAction"  method="testLogin">
+            <result name="ok">/main.jsp</result>
+            <result name="error">/login.jsp</result>
+      </action>
+<!-- debut vraie -->
+
+	<!-- <action name="oublier">
+            <result >/Page/Recover.jsp</result>
+      </action>
+	<action name="changeLangue" class="action.configuration.LangueAction"  method="change">
+            <result name="ok" type="redirectAction">accueil</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+      </action>
+     <action name="deconnexion" class="action.login.LoginAction"  method="deconnexion">
+            <result name="ok">/index.jsp</result>
+      </action>
+      <action name="testlogin" class="action.login.LoginAction"  method="testLogin">
+            <result name="ok" type="redirectAction">testFirstAcces</result>
+            <result name="error">/index.jsp</result>
+      </action>
+      
+      <action name="accueil" class="action.dashboard.DashboardAction"  method="prepareAccueil">
+            <result name="ok" >/Page/Accueil.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="passNotMatch">/Page/confirmation.jsp</result>
+      </action>
+      
+      <action name="publicationDashboard" class="action.dashboard.DashboardAction"  method="publication">
+            <result name="ok" >/Page/Dashboard/PublicationDashboard.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+      </action>
+      
+      <action name="numeroDashboard" class="action.dashboard.DashboardAction"  method="numero">
+            <result name="ok" >/Page/Dashboard/NumeroDashboard.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+      </action>
+      
+      <action name="editeurDashboard" class="action.dashboard.DashboardAction"  method="editeur">
+            <result name="ok" >/Page/Dashboard/EditeurDashboard.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+      </action>
+      
+      <action name="paysDashboard" class="action.dashboard.DashboardAction"  method="pays">
+            <result name="ok" >/Page/Dashboard/PaysDashboard.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+      </action>
+      
+      <action name="clientDashboard" class="action.dashboard.DashboardAction"  method="client">
+            <result name="ok" >/Page/Dashboard/ClientDashboard.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+      </action>
+      
+      <action name="itunesAll" class="action.apple.ItunesAction"  method="all">
+            <result name="ok" >/Page/Itunes/ItunesAll.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="itunesNo" class="action.apple.ItunesAction"  method="noregister">
+            <result name="ok" >/Page/Itunes/ItunesAll.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="itunesYes" class="action.apple.ItunesAction"  method="register">
+            <result name="ok" >/Page/Itunes/ItunesAll.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutModifItunes" class="action.apple.ItunesAction"  method="prepareForm">
+            <result name="ok" >/Page/Itunes/ItunesForm.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">itunesAll</result>
+      </action>
+      
+       <action name="valideItunes" class="action.apple.ItunesAction"  method="valide">
+            <result name="ok" type="redirectAction">itunesAll</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">
+           	 <param name="actionName">ajoutModifItunes</param>
+        		<param name="id">${id}</param>
+        		<param name="type">${type}</param>
+            </result>
+      </action>
+      
+      <action name="ficheProfil" class="action.login.LoginAction"  method="ficheProfil">
+            <result name="ok">/Page/Profil/ProfilFiche.jsp</result>
+            <result name="error">/index.jsp</result>
+      </action>
+      <action name="modifProfil" class="action.login.LoginAction"  method="prepareModif">
+            <result name="ok">/Page/Profil/ProfilForm.jsp</result>
+            <result name="error">/index.jsp</result>
+      </action>
+      <action name="valideModifProfil" class="action.login.LoginAction"  method="valideModif">
+            <result name="ok" type="redirectAction">ficheProfil</result>
+            <result name="error" type="redirectAction">modifProfil</result>
+      </action>
+      
+      <action name="valideModifAvatar" class="action.login.LoginAction"  method="modifAvatar">
+      	<interceptor-ref name="defaultStack"></interceptor-ref>
+            <result name="ok" type="redirectAction">ficheProfil</result>
+            <result name="error" type="redirectAction">ficheProfil</result>
+      </action>
+      
+      <action name="recoverCompte" class="action.login.LoginAction"  method="recuperCompte">
+            <result name="ok">/index.jsp</result>
+            <result name="error">/Page/Recover.jsp</result>
+      </action>
+      
+      <action name="valideAjoutProfil" class="action.login.LoginAction"  method="valideAjout">
+            <result name="ok" type="redirectAction">listeUtilisateur</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">ajoutUtilisateur</param>
+        		<param name="message">${message}</param>
+            </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="ajoutUtilisateur" class="action.login.LoginAction"  method="prepareAjout">
+            <result name="ok">/Page/Utilisateur/UtilisateurForm.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="listeUtilisateur" class="action.login.LoginAction"  method="prepareList">
+            <result name="ok">/Page/Utilisateur/UtilisateurList.jsp</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="error">/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="testFirstAcces" class="action.login.LoginAction"  method="testFirstAcces">
+            <result name="yes" type="redirectAction">prepareChangePasse</result>
+            <result name="reconnexion" >/index.jsp</result>
+            <result name="no" type="redirectAction">accueil</result>
+      </action> 
+      <action name="prepareChangePasse" class="action.login.LoginAction"  method="prepareChangePassword">
+            <result name="ok">/Page/confirmation.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+      </action>
+      <action name="changePassword" class="action.login.LoginAction"  method="changePassword">
+            <result name="ok" type="redirectAction">accueil</result>
+            <result name="reconnexion" >/index.jsp</result>
+             <result name="error" type="redirectAction">
+				<param name="actionName">prepareChangePasse</param>
+        		<param name="message">${message}</param>
+        	</result>
+      </action>
+      <action name="listeCategorie" class="action.store.CategorieAction"  method="prepareList">
+            <result name="ok" >/Page/Categorie/CategorieList.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="error" type="redirectAction">
+				<param name="actionName">accueil</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="ficheCategorie" class="action.store.CategorieAction"  method="prepareFiche">
+            <result name="ok" >/Page/Categorie/CategorieFiche.jsp</result>
+           <result name="reconnexion">/index.jsp</result>
+           <result name="error" type="redirectAction">
+				<param name="actionName">listeCategorie</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="ajoutModifCategorie" class="action.store.CategorieAction"  method="prepareForm">
+            <result name="ok" >/Page/Categorie/CategorieForm.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="error" type="redirectAction">
+				<param name="actionName">ficheCategorie</param>
+        		<param name="idcategorie">${idcategorie}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="valideCategorie" class="action.store.CategorieAction"  method="valide">
+      		<result name="reconnexion">/index.jsp</result>
+            <result name="ok" type="redirectAction">
+            	<param name="actionName">ficheStore</param>
+        		<param name="idpays">${idpays}</param>
+        	</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">ajoutModifCategorie</param>
+        		<param name="idcategorie">${idcategorie}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="listePublication" class="action.publication.PublicationAction"  method="prepareList">
+      		<result name="ok" >/Page/Publication/PublicationList.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">accueil</param>
+        		<param name="message">${message}</param>
+        	</result>
+      </action>
+       <action name="fichePublication" class="action.publication.PublicationAction"  method="prepareFichePublication">
+      		<result name="ok" >/Page/Publication/PublicationFiche.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">listePublication</param>
+        		<param name="message">${message}</param>
+        	</result>
+      </action>
+      <action name="ajoutModifPublication" class="action.publication.PublicationAction"  method="prepareForm">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" >/Page/Publication/PublicationForm.jsp</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">listePublication</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="validePublication" class="action.publication.PublicationAction"  method="valide">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">listePublication</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">ajoutModifPublication</param>
+        		<param name="message">${message}</param>
+        		<param name="idpublication">${idpublication}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="listeStore" class="action.store.StoreAction"  method="prepareListeStore">
+      		<result name="ok" >/Page/Store/StoreList.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">accueil</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="valideStore" class="action.store.StoreAction"  method="valide">
+      		 <result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">listeStore</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">ajoutModifStore</param>
+        		<param name="message">${message}</param>
+        		<param name="idpays">${idpays}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="ficheStore" class="action.store.StoreAction"  method="prepareFiche">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" >/Page/Store/StoreFiche.jsp</result>
+             <result name="error" type="redirectAction">
+            	<param name="actionName">listeStore</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutModifStore" class="action.store.StoreAction"  method="prepareForm">
+      		<result name="ok" >/Page/Store/StoreForm.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">listeStore</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+       <action name="deleteCarrousel" class="action.store.CarrouselAction"  method="delete">
+       		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">
+             	<param name="idpays">${idpays}</param>
+             	<param name="actionName">ficheStore</param>
+             </result>
+            <result name="reconnexion">/index.jsp</result>
+             <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="actionName">ficheStore</param>
+             </result>
+             <result name="notacces" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="actionName">accueil</param>
+             </result>
+      </action>
+      
+      <action name="ajoutModifSousCategorie" class="action.store.SousCategorieAction"  method="prepareForm">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" >/Page/SousCategorie/SousCategorieForm.jsp</result>
+            <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="actionName">ficheCategorie</param>
+             </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="valideSousCategorie" class="action.store.SousCategorieAction"  method="valide">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">
+             	<param name="idcategorie">${idcategorie}</param>
+             	<param name="actionName">ficheCategorie</param>
+      		</result>
+            <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="idsouscategorie">${idsouscategorie}</param>
+             	<param name="actionName">ajoutModifSousCategorie</param>
+             </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutMotCle" class="action.configuration.MotCleAction"  method="prepareForm">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" >/Page/MotCle/MotCleForm.jsp</result>
+      		<result name="error" type="redirectAction">listeMotCle</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="deleteMotCle" class="action.configuration.MotCleAction"  method="delete">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">listeMotCle</result>
+            <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="actionName">listeMotCle</param>
+             </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="valideMotCle" class="action.configuration.MotCleAction"  method="valide">
+      	<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">listeMotCle</result>
+            <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="actionName">ajoutMotCle</param>
+             </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="listeMotCle" class="action.configuration.MotCleAction"  method="prepareListe">
+      		<result name="ok">/Page/MotCle/MotCleList.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="actionName">accueil</param>
+             </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutModifNumero" class="action.publication.NumeroAction"  method="prepareForm">
+      		<result name="ok">/Page/Numero/NumeroForm.jsp</result>
+      		<result name="reconnexion">/index.jsp</result>
+             <result name="error" type="redirectAction">
+             	<param name="message">${message}</param>
+             	<param name="idpublication">${idpublication}</param>
+             	<param name="actionName">fichePublication</param>
+             </result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="valideNumero" class="action.publication.NumeroAction"  method="valide">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">
+				<param name="actionName">fichePublication</param>
+        		<param name="idpublication">${idpublication}</param>
+        	</result>
+            <result name="error" >
+            /Page/Numero/NumeroForm.jsp
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      <action name="ficheNumero" class="action.publication.NumeroAction"  method="prepareFiche">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok">/Page/Numero/NumeroFiche.jsp</result>
+            <result name="error" type="redirectAction">
+            	<param name="actionName">fichePublication</param>
+            	<param name="message">${message}</param>
+        		<param name="idpublication">${idpublication}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutModifCarrousel" class="action.store.CarrouselAction"  method="prepareForm">
+      		<result name="ok">/Page/Carrousel/CarrouselForm.jsp</result>
+            <result name="reconnexion">/index.jsp</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+       <action name="valideCarrousel" class="action.store.CarrouselAction"  method="valide">
+      		<result name="ok" type="redirectAction">
+            	<param name="actionName">ficheStore</param>
+        		<param name="idpays">${idpays}</param>
+        	</result>
+            <result name="error" type="redirectAction">ajoutModifCarrousel</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="listParametre" class="action.configuration.ParametreAction"  method="prepareList">
+     		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" >/Page/Parametre/ParametreList.jsp</result>
+            <result name="error" type="redirectAction">
+           	 <param name="actionName">accueil</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutModifParametre" class="action.configuration.ParametreAction"  method="prepareForm">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" >/Page/Parametre/ParametreForm.jsp</result>
+            <result name="error" type="redirectAction">
+           	 <param name="actionName">listParametre</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="valideParametre" class="action.configuration.ParametreAction"  method="valide">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">listParametre</result>
+            <result name="error" type="redirectAction">
+           	 <param name="actionName">ajoutModifParametre</param>
+        		<param name="idparametre">${idparametre}</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="ajoutIncitation" class="action.incitation.IncitationAction" method="prepareForm">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok">/Page/Incitation/IncitationForm.jsp</result>
+            <result name="error" type="redirectAction">
+           	 <param name="actionName">accueil</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      
+      <action name="valideIncitation" class="action.incitation.IncitationAction" method="valide">
+      		<result name="reconnexion">/index.jsp</result>
+      		<result name="ok" type="redirectAction">
+           	 <param name="actionName">ajoutIncitation</param>
+        	</result>
+            <result name="error" type="redirectAction">
+           	 	<param name="actionName">ajoutIncitation</param>
+        		<param name="message">${message}</param>
+        	</result>
+            <result name="notacces" type="redirectAction">accueil</result>
+      </action>
+      -->
+      </package>
+      </struts>
