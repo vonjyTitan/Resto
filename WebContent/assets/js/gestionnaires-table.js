@@ -25,10 +25,10 @@ moovemodeVal)
 	var canvas = document.createElement('canvas');
         div = $("#"+idDiv); 
         canvas.id     = "CursorLayer";
-        canvas.width  = 600;
-        canvas.height = 500;
+        canvas.width  = 500;
+        canvas.height = 175;
         canvas.style.zIndex   = 8;
-        canvas.style.position = "absolute";
+       // canvas.style.position = "absolute";
         canvas.style.border   = "1px solid";
         div.append(canvas)
 	
@@ -38,19 +38,12 @@ moovemodeVal)
   height = canvas.height;	
   
    canvas.addEventListener('mousedown', function(event){
-   mousePress=true;
-   if (event.x != undefined && event.y != undefined)
-        {
-          x = event.x;
-          y = event.y;
-        }
-        else // Firefox method to get the position
-        {
-          x = event.clientX + document.body.scrollLeft +
-              document.documentElement.scrollLeft;
-          y = event.clientY + document.body.scrollTop +
-              document.documentElement.scrollTop;
-        }
+	   mousePress=true;
+
+	   canoffset = $(canvas).offset();
+	   x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
+	   y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
+
 		selectTable(x,y);
 		if(selectedTable!=undefined){
 			if(selectmode){
@@ -70,18 +63,10 @@ moovemodeVal)
  selectedTable=undefined;
  }, false);
   canvas.addEventListener('mousemove', function(event){ 
-  if (event.x != undefined && event.y != undefined)
-        {
-          x = event.x;
-          y = event.y;
-        }
-        else // Firefox method to get the position
-        {
-          x = event.clientX + document.body.scrollLeft +
-              document.documentElement.scrollLeft;
-          y = event.clientY + document.body.scrollTop +
-              document.documentElement.scrollTop;
-        }
+	  canoffset = $(canvas).offset();
+	   x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
+	   y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
+
 	if(mousePress && selectedTable!=undefined && moovemode){
 		selectedTable.move(x,y);
 	}
