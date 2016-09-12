@@ -27,7 +27,6 @@ public abstract class DataEntity {
     // Fields
     // ===========================================================
 	
-	private int pageSize=30;
 	private boolean isZeroInclue=false;
 	private Field[] fields;
 	private Class self=this.getClass();
@@ -35,7 +34,55 @@ public abstract class DataEntity {
 	private TypeComparaison typeComparison=TypeComparaison.PARTIAL;
 	private boolean isIgnoreCase=true;
 	private String nomTable;
-	
+	private int packSize=30;
+	private String dataBaseKey="resto";
+	private Map<String, String> concatString=new HashMap<String,String>();
+	private String nomChampOrder;
+	private String ordering;
+	public static final String ASC=" asc ";
+	public static final String DESC=" desc ";
+	private  List<Field> summField=new ArrayList<Field>();
+	private  List<Field> groupField=new ArrayList<Field>();
+	private int count=0;
+	public int findPackSize() {
+		return packSize;
+	}
+
+	public void setPackSize(int packSize) {
+		this.packSize = packSize;
+	}
+
+	public String findDataBaseKey() {
+		return dataBaseKey;
+	}
+
+	public void setDataBaseKey(String dataBaseKey) {
+		this.dataBaseKey = dataBaseKey;
+	}
+
+	public Map<String, String> findConcatString() {
+		return concatString;
+	}
+
+	public void setConcatString(Map<String, String> concatString) {
+		this.concatString = concatString;
+	}
+
+	public String findNomChampOrder() {
+		return nomChampOrder;
+	}
+
+	public void setNomChampOrder(String nomChampOrder) {
+		this.nomChampOrder = nomChampOrder;
+	}
+
+	public String findOrdering() {
+		return ordering;
+	}
+
+	public void setOrdering(String ordering) {
+		this.ordering = ordering;
+	}
 	public enum TypeComparaison{
 		PARTIAL,
 		COMPLET
@@ -54,7 +101,7 @@ public abstract class DataEntity {
 		this.nomTable = nomTable;
 	}
 	
-	public String getReference(){
+	public String findReference(){
 		if(this.nomTable!=null && this.nomTable!="")
 			return this.nomTable;
 		Class classe=this.getClass();
@@ -121,7 +168,7 @@ public abstract class DataEntity {
 						formError.put(f, errorMessage);
 					}
 				}
-				else{
+				if(value!=null){
 					
 					if((annotation=f.getAnnotation(StringRestrict.class))!=null){
 						valideChampString(f,(StringRestrict) annotation,value);
@@ -248,7 +295,7 @@ public abstract class DataEntity {
 		Class classe=self;
 		List<Field> lc=new ArrayList<Field>(); 
 		Field[]inter=null;
-		while(classe!=DataEntity.class && classe!=BaseModele.class){
+		while(classe!=DataEntity.class){
 			inter=classe.getDeclaredFields();
 			for(Field f:inter){
 				lc.add(f);
@@ -324,6 +371,26 @@ public abstract class DataEntity {
 	public String getOption(){
 		return "";
 	}
+	public void addCountChamp(String champ)throws Exception{
+		Field f=this.getFieldByName(champ);
+		if(f!=null)
+			throw new Exception("Champ "+champ+" introuvable");
+		this.summField.add(f);
+	}
+	public void addCountChamp(String[]champs)throws Exception{
+		for(String s:champs)
+			addCountChamp(s);
+	}
+	public void addGroupChamp(String champ)throws Exception{
+		Field f=this.getFieldByName(champ);
+		if(f!=null)
+			throw new Exception("Champ "+champ+" introuvable");
+		this.groupField.add(f);
+	}
+	public void addGroupChamp(String[]champs)throws Exception{
+		for(String s:champs)
+			addGroupChamp(s);
+	}
 	// ===========================================================
     // private method
     // ===========================================================
@@ -347,13 +414,7 @@ public abstract class DataEntity {
     // getters and setters
     // ===========================================================
 	
-	public int getPageSize() {
-		return pageSize;
-	}
-
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
+	
 
 	public boolean isZeroInclue() {
 		return isZeroInclue;
@@ -362,13 +423,13 @@ public abstract class DataEntity {
 	public void setZeroInclue(boolean isZeroInclue) {
 		this.isZeroInclue = isZeroInclue;
 	}
-	public Map<Field,String> getFormError() {
+	public Map<Field,String> findFormError() {
 		return formError;
 	}
 	public void setFormError(Map<Field,String> formError) {
 		this.formError = formError;
 	}
-	public TypeComparaison getTypeComparison() {
+	public TypeComparaison findTypeComparison() {
 		return typeComparison;
 	}
 	public void setTypeComparison(TypeComparaison typeComparison) {
@@ -379,6 +440,30 @@ public abstract class DataEntity {
 	}
 	public void setIgnoreCase(boolean isIgnoreCase) {
 		this.isIgnoreCase = isIgnoreCase;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public List<Field> findSummField() {
+		return summField;
+	}
+
+	public void setCountField(List<Field> countField) {
+		this.summField = countField;
+	}
+
+	public List<Field> findGroupField() {
+		return groupField;
+	}
+
+	public void setGroupField(List<Field> entetField) {
+		this.groupField = entetField;
 	}
 	
 }

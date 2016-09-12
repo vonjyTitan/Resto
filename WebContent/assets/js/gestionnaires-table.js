@@ -55,6 +55,9 @@ moovemodeVal)
 			}
 		}
 }, false); 
+   canvas.addEventListener('mouseleave', function(event){
+	   selectedTable=null;
+   });
  canvas.addEventListener('mouseup', function(event){ 
  mousePress=false;
  if(selectedTable!=undefined && moovemode){

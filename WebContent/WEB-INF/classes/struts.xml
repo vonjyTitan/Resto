@@ -32,7 +32,7 @@
             <result >/index.jsp</result>
       </action>
       -->
-<action name="testLogin" class="action.LoginAction"  method="testLogin">
+ <action name="testLogin" class="action.LoginAction"  method="testLogin">
             <result name="ok">/main.jsp</result>
             <result name="error">/login.jsp</result>
       </action>

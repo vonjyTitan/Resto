@@ -16,7 +16,7 @@ public class ListPaginner<E> extends ArrayList<E> {
 		Object objet = this.get(0);
 		
 		Method method=objet.getClass().getMethod("get"+DaoModele.setMaj(fieldName), null);
-		Field []fields = ((BaseModele)objet).getAllFields();
+		Field []fields = ((DataEntity)objet).getAllFields();
 		Field field = null;
 		for(Field f:fields)
 			if(f.getName().equals(fieldName))

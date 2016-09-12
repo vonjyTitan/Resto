@@ -23,7 +23,7 @@ import javax.el.MethodNotFoundException;
 
 import com.annotations.Parameter;
 
-import com.mapping.BaseModele;
+import com.mapping.DataEntity;
 import com.mapping.ListPaginner;
 import dao.Connecteur.DatabaseType;
 
@@ -38,7 +38,7 @@ public class DaoModele {
     		return instance=new DaoModele();
     	return instance;
     }
-    public String getRequette(int page,String nomTable,BaseModele objet){
+    public String getRequette(int page,String nomTable,DataEntity objet){
     	String reponse=" SELECT * FROM "+nomTable;
     	if(objet.findNomChampOrder()!=null && objet.findOrdering()!=null)
     		reponse+=" order by "+objet.findNomChampOrder()+" "+objet.findOrdering();
@@ -52,7 +52,7 @@ public class DaoModele {
     	
     	return reponse;
     }
-    public int getNbPage(String nomTable,BaseModele objet,Connection connection)throws Exception
+    public int getNbPage(String nomTable,DataEntity objet,Connection connection)throws Exception
     {
     	int reponse=0;
 		Statement stat=null;
@@ -98,7 +98,7 @@ public class DaoModele {
             return false;
         return true;
     }
-    public List<BaseModele> findPageGenerique(int page,BaseModele objet,String apresWhere) throws Exception{
+    public <T extends DataEntity> List<T> findPageGenerique(int page,T objet,String apresWhere) throws Exception{
 		Connection connection=null;
 		try{
 			connection=Connecteur.getConnection(objet.findDataBaseKey());
@@ -113,7 +113,7 @@ public class DaoModele {
 			
 		}
     }
-    public List<BaseModele> findPageGenerique(int page,BaseModele objet) throws Exception{
+    public <T extends DataEntity> List<T> findPageGenerique(int page,T objet) throws Exception{
 		Connection connection=null;
 		try{
 			connection=Connecteur.getConnection(objet.findDataBaseKey());
@@ -128,21 +128,49 @@ public class DaoModele {
 			
 		}
     }
-    public List<BaseModele> findPageGenerique(int page,BaseModele objet,Connection connection,String apresWhere) throws Exception{
+    public <T extends DataEntity> List<T> findStat(int page,T objet,Connection connection,String apresWhere)throws Exception
+    {
+    	Field[]fields=objet.getAllFields();
+    	List<Field> summ=objet.findSummField();
+    	List<Field> group=objet.findGroupField();
+    	String toSumm="";
+    	String toGroup="";
+    	if(group.size()==0){
+    		throw new Exception("Les colonnes dans le group by sont obligatoires");
+    	}
+    	for(Field f:summ){
+    		if(!isExisteChamp(objet.getReferenceForField(f), objet.findReference(), connection))
+    			continue;
+    		toSumm+=",summ("+objet.getReferenceForField(f)+") as "+objet.getReferenceForField(f);
+    	}
+    	boolean isFirst=true;
+    	for(Field f:group){
+    		if(!isExisteChamp(objet.getReferenceForField(f), objet.findReference(), connection))
+    			continue;
+    		if(!isFirst)
+    			toGroup+=",";
+    		isFirst=false;
+    		toGroup+=""+objet.getReferenceForField(f);
+    	}
+    	String requette="(select count(*) as count "+toSumm+" from "+objet.findReference()+" group by "+toGroup+" ) as interstat ";
+    	objet.setNomTable(requette);
+    	return findPageGenerique(page, objet, connection, apresWhere);
+    }
+    public <T extends DataEntity> List<T> findPageGenerique(int page,T objet,Connection connection,String apresWhere) throws Exception{
     	
-    	List<BaseModele> reponse=new ListPaginner<BaseModele>();
+    	List<T> reponse=new ListPaginner<T>();
 		Statement stat=null;
 		ResultSet rs=null;
 		String nomTable;
 		try{
 			nomTable=getNomTable(objet,connection,apresWhere);
-			((ListPaginner<BaseModele>)(reponse)).nbPage = this.getNbPage(nomTable,objet,connection);
+			((ListPaginner<T>)(reponse)).nbPage = this.getNbPage(nomTable,objet,connection);
 			if(page<=0)
 				return reponse;
-			int nbpage=((ListPaginner<BaseModele>)(reponse)).nbPage;
+			int nbpage=((ListPaginner<DataEntity>)(reponse)).nbPage;
 			if(nbpage<=0)return reponse;
-            if (this.isPageExiste(((ListPaginner<BaseModele>)(reponse)).nbPage, page) == false)
-                return this.findPageGenerique(((ListPaginner<BaseModele>)(reponse)).nbPage-1,objet,connection,apresWhere);
+            if (this.isPageExiste(((ListPaginner<DataEntity>)(reponse)).nbPage, page) == false)
+                return this.findPageGenerique(((ListPaginner<DataEntity>)(reponse)).nbPage-1,objet,connection,apresWhere);
             
             String query=this.getRequette(page,nomTable,objet);
             
@@ -150,7 +178,7 @@ public class DaoModele {
              rs=stat.executeQuery(query);
             reponse=resoudre(rs,objet);
             
-            ((ListPaginner<BaseModele>)(reponse)).nbPage = nbpage;
+            ((ListPaginner<T>)(reponse)).nbPage = nbpage;
             
 		}
 		catch(Exception ex){
@@ -164,25 +192,25 @@ public class DaoModele {
 			
 		return reponse;
     }
-    public List<BaseModele> resoudre(ResultSet rs,BaseModele objet)throws Exception{
+    public <T extends DataEntity> List<T> resoudre(ResultSet rs,T objet)throws Exception{
     	
-    	List<BaseModele> reponse=new ListPaginner<BaseModele>();
+    	List<T> reponse=new ListPaginner<T>();
     	try{
     	
-    	BaseModele inter=null;
+    	T inter=null;
     	Field[]interv=objet.getAllFields();
     	ResultSetMetaData meta=rs.getMetaData();
         while(rs.next()){
-        	inter=(BaseModele) objet.getClass().newInstance();
+        	inter=(T) objet.getClass().newInstance();
         	for(int i=0;i<interv.length;i++){
         		if(isBaseType((interv[i]).getType())==false){
         			continue;
         		}
         		String getting=setMaj(interv[i].getType().getSimpleName());
-        		if(isExisteColonne(rs, interv[i].getName())==false){
+        		if(isExisteColonne(rs,inter.getReferenceForField(interv[i]))==false){
         			continue;
         		}
-        		Object valeur=rs.getClass().getMethod("get"+getting,new Class[]{String.class}).invoke(rs, interv[i].getName());
+        		Object valeur=rs.getClass().getMethod("get"+getting,new Class[]{String.class}).invoke(rs, inter.getReferenceForField(interv[i]));
         		if(rs.wasNull()){
         			continue;
         		}
@@ -199,6 +227,10 @@ public class DaoModele {
         			meth.invoke(inter, valeur);
         			
         		}
+        	}
+        	if(isExisteColonne(rs, "count"))
+        	{
+        		inter.setCount(rs.getInt("count"));
         	}
         	reponse.add(inter);
         }
@@ -230,7 +262,7 @@ public class DaoModele {
     	}
     	return false;
     }
-    boolean isExisteChamp(Field champ,String nomTable,Connection conn) throws Exception{
+    boolean isExisteChamp(String champ,String nomTable,Connection conn) throws Exception{
     	Statement stat=null;
     	ResultSet rs=null;
     	try{
@@ -239,7 +271,7 @@ public class DaoModele {
     		ResultSetMetaData rsmd = rs.getMetaData();
     		int columns = rsmd.getColumnCount();
     	    for (int x = 1; x <= columns; x++) {
-    	        if (champ.getName().compareToIgnoreCase(rsmd.getColumnName(x))==0 && champ.getName().length()==rsmd.getColumnName(x).length()) {
+    	        if (champ.compareToIgnoreCase(rsmd.getColumnName(x))==0 && champ.length()==rsmd.getColumnName(x).length()) {
     	        
     	        	return true;
     	        }
@@ -257,43 +289,47 @@ public class DaoModele {
     	}
     	
     }
-    public void save(List<BaseModele> BaseModele, Connection con) throws Exception
+    public void save(List<DataEntity> data, Connection con) throws Exception
 	{
 		PreparedStatement pst=null;
 
 		try
 		{
-			if(BaseModele.size()==0)
+			if(data.size()==0)
 				return;
-			String requete=buildQueryInsert(BaseModele.get(0));
+			String requete=buildQueryInsert(data.get(0));
 			
 			pst=con.prepareStatement(requete,Statement.RETURN_GENERATED_KEYS);
 			int indiceStat=1;
-			Field[] champs=BaseModele.get(0).getAllFields();
-			for(int ii=0;ii<BaseModele.size();ii++){
+			Field[] champs=data.get(0).getAllFields();
+			for(int ii=0;ii<data.size();ii++){
+				if(!data.get(ii).isValide())
+				{
+					throw new Exception("erreur");
+				}
 				for(int i=0; i<champs.length;i++)
 				{
-					if(isExisteChamp(champs[i],BaseModele.get(0).getReference(),con)==false)continue;
-					if(champs[i].getName().compareToIgnoreCase(BaseModele.get(0).getPkName())==0)continue;
+					if(isExisteChamp(data.get(0).getReferenceForField(champs[i]),data.get(0).findReference(),con)==false)continue;
+					if(champs[i].getName().compareToIgnoreCase(data.get(0).getPkName())==0)continue;
 					if(isBaseType(champs[i].getType())==false)continue;
 					
 					Method m=null;
 					try{
-						m=BaseModele.get(ii).getClass().getMethod("get"+setMaj(champs[i].getName()), null);
+						m=data.get(ii).getClass().getMethod("get"+setMaj(champs[i].getName()), null);
 					}
 					catch(NoSuchMethodException ex){
 						try{
-							m=BaseModele.get(ii).getClass().getMethod("find"+setMaj(champs[i].getName()), null);
+							m=data.get(ii).getClass().getMethod("find"+setMaj(champs[i].getName()), null);
 						}
 						catch(Exception e){
 						}
 					}
 					Object val=null;
 					if(champs[i].getType().equals(java.util.Date.class)){
-						Object inter=m.invoke(BaseModele.get(ii), null);
+						Object inter=m.invoke(data.get(ii), null);
 						val=(inter!=null) ? new java.sql.Date(((java.util.Date) inter).getTime()) : null ;
 					}
-					else val=m.invoke(BaseModele.get(ii), null);
+					else val=m.invoke(data.get(ii), null);
 					pst.setObject(indiceStat, val);
 					indiceStat++;
 				}
@@ -302,7 +338,7 @@ public class DaoModele {
 				try(ResultSet generatedKey=pst.getGeneratedKeys()){
 					if(generatedKey.next()){
 						try{
-							BaseModele.get(ii).getClass().getMethod("set"+setMaj(BaseModele.get(0).getPkName()), int.class).invoke(BaseModele.get(ii), generatedKey.getInt(BaseModele.get(0).getPkName()));
+							data.get(ii).getClass().getMethod("set"+setMaj(data.get(0).getPkName()), int.class).invoke(data.get(ii), generatedKey.getInt(data.get(0).getPkName()));
 						}
 						catch(Exception ex){
 							
@@ -322,7 +358,7 @@ public class DaoModele {
 			if(pst!=null) pst.close();	
 		}
 	}
-	public String buildQueryInsert(BaseModele bm) throws Exception 
+	public String buildQueryInsert(DataEntity bm) throws Exception 
 	{
 		Connection conn=null;
 		try{
@@ -336,7 +372,7 @@ public class DaoModele {
 		
 		for(int i=0; i<fields.length; i++)
 		{
-			if(isExisteChamp(fields[i],bm.getReference(),conn)==false)continue;
+			if(isExisteChamp(bm.getReferenceForField(fields[i]),bm.findReference(),conn)==false)continue;
 			if(fields[i].getName().compareToIgnoreCase(bm.getPkName())==0)continue;
 			if(isBaseType(fields[i].getType())==false)continue;
 			if(index==true) 
@@ -351,7 +387,7 @@ public class DaoModele {
 			
 			
 		}		
-		String requete="insert into "+bm.getReference()+" ("+champs+") values ("+valeurs+")";
+		String requete="insert into "+bm.findReference()+" ("+champs+") values ("+valeurs+")";
 		return requete;
 		}
 		catch(Exception ex){
@@ -363,12 +399,12 @@ public class DaoModele {
 				conn.close();
 		}
 	}
-	public String buildId(BaseModele bm, Connection con) throws Exception
+	public String buildId(DataEntity bm, Connection con) throws Exception
 	{
 		return "";
 		
 	}
-	String getCondition(BaseModele objet,Connection conn,String apresWhere)throws Exception{
+	String getCondition(DataEntity objet,Connection conn,String apresWhere)throws Exception{
 		String reponse="";
 		if(objet!=null){
 			
@@ -396,17 +432,23 @@ public class DaoModele {
 		reponse+=" 1=1 "+apresWhere;
 		return reponse;
 	}
-	String getNomTable(BaseModele objet,Connection conn,String apresWhere)throws Exception{
-		return objet.getReference()+" WHERE "+getCondition(objet,conn,apresWhere);
+	String getNomTable(DataEntity objet,Connection conn,String apresWhere)throws Exception{
+		return objet.findReference()+" WHERE "+getCondition(objet,conn,apresWhere);
 	}
-	public void update(List<BaseModele> liste,Connection conn)throws Exception{
+	public void update(List<DataEntity> liste,Connection conn,String apresWhere)throws Exception{
 		String[]col=colModif(liste.get(0));
 		String query=getRequetteModif(liste.get(0),col);
+		if(apresWhere!=null)
+			query+=" "+apresWhere;
 		PreparedStatement prstat=conn.prepareStatement(query);
 		Field[]attr=liste.get(0).getAllFields();
 		boolean isValable=false;
 		int comptset=1;
 		for(int ii=0;ii<liste.size();ii++){
+			if(!liste.get(ii).isValide())
+			{
+				throw new Exception("erreur");
+			}
 			for(String s:col){
 				if(s!=null){
 					Object valeur=null;
@@ -426,17 +468,17 @@ public class DaoModele {
 				}
 				else break;
 			}
-			prstat.setObject(comptset,liste.get(ii).getClass().getMethod("get"+setMaj(((BaseModele)liste.get(ii)).getPkName()), null).invoke(liste.get(ii), null));
+			prstat.setObject(comptset,liste.get(ii).getClass().getMethod("get"+setMaj(((DataEntity)liste.get(ii)).getPkName()), null).invoke(liste.get(ii), null));
 			comptset=1;
 			prstat.executeUpdate();
 		}
 	}
-	public void update(List<BaseModele> liste)throws Exception{
+	public void update(List<DataEntity> liste)throws Exception{
 		Connection conn = null;
 		try{
 			conn=Connecteur.getConnection(liste.get(0).findDataBaseKey());
 			conn.setAutoCommit(false);
-			update(liste,conn);
+			update(liste,conn,"");
 			conn.commit();
 		}
 		catch(Exception ex){
@@ -452,7 +494,7 @@ public class DaoModele {
 			}
 		}
 	}
-	String [] colModif(BaseModele modele)throws Exception{
+	String [] colModif(DataEntity modele)throws Exception{
 		
 		Field[]attr=modele.getAllFields();
 		String reponse[]=new String[attr.length];
@@ -484,14 +526,14 @@ public class DaoModele {
 		}
 		return reponse;
 	}
-	String getRequetteModif(BaseModele modele,String[]field)throws Exception{
-		String reponse=" update "+modele.getReference()+" set ";
+	String getRequetteModif(DataEntity modele,String[]field)throws Exception{
+		String reponse=" update "+modele.findReference()+" set ";
 		boolean isIndex=true;
 		for(String s:field){
 			if(s!=null){
 				if(isIndex==false)
 					reponse+=" ,";
-				reponse+=" "+s+"=?";
+				reponse+=" "+modele.getReferenceForField(modele.getFieldByName(s))+"=?";
 				isIndex=false;
 			}
 			else break;
@@ -499,12 +541,12 @@ public class DaoModele {
 		reponse+=" WHERE "+modele.getPkName()+"=?";
 		return reponse;
 	}
-	public void save(BaseModele av, Connection connection)throws Exception {
-		List<BaseModele> liste=new ArrayList<BaseModele>();
+	public void save(DataEntity av, Connection connection)throws Exception {
+		List<DataEntity> liste=new ArrayList<DataEntity>();
 		liste.add(av);
 		this.save(liste, connection);
 	}
-	public void save(BaseModele av)throws Exception {
+	public void save(DataEntity av)throws Exception {
 		Connection conn=null;
 		try{
 			conn=Connecteur.getConnection(av.findDataBaseKey());
@@ -519,11 +561,11 @@ public class DaoModele {
 			}
 	}
 	
-	public void update(BaseModele objet)throws Exception {
+	public void update(DataEntity objet,String apresWhere)throws Exception {
 		Connection conn=null;
 		try{
 			conn=Connecteur.getConnection(objet.findDataBaseKey());
-			update(objet,conn);
+			update(objet,conn,apresWhere);
 		}
 		catch(Exception ex){
 			
@@ -535,12 +577,20 @@ public class DaoModele {
 		}
 		
 	}
-	public void update(BaseModele objet,Connection conn)throws Exception {
-		List<BaseModele> liste=new ArrayList<BaseModele>();
-		liste.add(objet);
-		update(liste,conn);
+	public void update(DataEntity objet)throws Exception {
+			update(objet,"");
 	}
-	public void delete(BaseModele objet)throws Exception{
+	public void update(DataEntity objet,Connection conn,String apresWhere)throws Exception {
+		List<DataEntity> liste=new ArrayList<DataEntity>();
+		liste.add(objet);
+		update(liste,conn,apresWhere);
+	}
+	public void update(DataEntity objet,Connection conn)throws Exception {
+		List<DataEntity> liste=new ArrayList<DataEntity>();
+		liste.add(objet);
+		update(liste,conn,"");
+	}
+	public void delete(DataEntity objet)throws Exception{
 		Connection connexion=null;
 		try{
 			connexion=Connecteur.getConnection(objet.findDataBaseKey());
@@ -554,9 +604,9 @@ public class DaoModele {
 				connexion.close();
 		}
 	}
-	public void delete(BaseModele objet,Connection connexion)throws Exception{
+	public void delete(DataEntity objet,Connection connexion)throws Exception{
 		try{
-			List<BaseModele> inter=new ArrayList<BaseModele>();
+			List<DataEntity> inter=new ArrayList<DataEntity>();
 			inter.add(objet);
 			delete(inter,connexion);
 		}
@@ -564,14 +614,14 @@ public class DaoModele {
 			throw ex;
 		}
 	}
-	public void delete(List<BaseModele> objet,Connection connexion)throws Exception{
+	public void delete(List<DataEntity> objet,Connection connexion)throws Exception{
 		PreparedStatement stmt=null;
 		String condition=" "+objet.get(0).getPkName()+"=?";
 		
 		try{
-			stmt=connexion.prepareStatement("delete from "+objet.get(0).getReference()+" where "+condition);
+			stmt=connexion.prepareStatement("delete from "+objet.get(0).findReference()+" where "+condition);
 			int nbDelet=0;
-			for(BaseModele b:objet)
+			for(DataEntity b:objet)
 			{
 					Object valeur=null;
 					try{
@@ -598,7 +648,7 @@ public class DaoModele {
 				stmt.close();
 		}
 	}
-	public void delete(List<BaseModele> objet)throws Exception{
+	public void delete(List<DataEntity> objet)throws Exception{
 		Connection connexion=null;
 		try{
 			connexion=Connecteur.getConnection(objet.get(0).findDataBaseKey());
@@ -612,11 +662,6 @@ public class DaoModele {
 			if(connexion!=null)
 				connexion.close();
 		}
-	}
-	public boolean isAttributBase(Field attribut,String nomTable){
-		if(attribut.getName().compareTo("ASC")==0 || attribut.getName().compareTo("DESC")==0 || attribut.getName().compareTo("typeComparaison")==0 || attribut.getName().compareTo("nomChampOrder")==0 || attribut.getName().compareTo("ordering")==0 || attribut.getName().compareTo("ZeroComparaisonInclue")==0 || attribut.getName().compareTo("packSize")==0|| attribut.getName().compareTo("nomTable")==0 || attribut.getName().compareTo("dataBaseKey")==0 || attribut.getName().compareTo("concatString")==0)
-			return true;
-		return false;
 	}
 	public List<Map<String, Object>> excecuteQuery(String query,String dataBaseKey)throws Exception{
 		Connection conn=null;
