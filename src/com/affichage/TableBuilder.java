@@ -27,6 +27,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	private Map<Field,String> classForEntete=null;
 	private Map<Field,String> lienForChamp=null;
 	private Map<Field,Field> idchampForchamp=null;
+	private FilterBuilder filterBuilder=null;
 	
 	public TableBuilder(T entity,HttpServletRequest request){
 		super(entity,request);
@@ -34,6 +35,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		classForEntete=new HashMap<Field,String>();
 		lienForChamp=new HashMap<Field,String>();
 		idchampForchamp=new HashMap<Field,Field>();
+		setFilterBuilder(new FilterBuilder(entity, request));
 	}
 	public TableBuilder(T entity,ListPaginner<T> data,HttpServletRequest request){
 		this(entity,request);
@@ -174,7 +176,6 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	public String getHTMLWithCheckbox() throws Exception{
 		return getHTML(true);
 	}
-
 	public List<T> getData() {
 		return data;
 	}
@@ -234,5 +235,11 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	}
 	public void setClassForTabe(String classForTabe) {
 		this.classForTabe = classForTabe;
+	}
+	public FilterBuilder getFilterBuilder() {
+		return filterBuilder;
+	}
+	public void setFilterBuilder(FilterBuilder filterBuilder) {
+		this.filterBuilder = filterBuilder;
 	}
 }
