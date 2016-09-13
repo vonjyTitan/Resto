@@ -2,19 +2,24 @@ package com.affichage;
 
 import java.lang.reflect.Field;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.affichage.FormBuilder.ERROR_SHOW;
+import com.affichage.InsertUpdateBuilder.ERROR_SHOW;
 import com.mapping.DataEntity;
 
-public class FilterBuilder extends HTMLBuilder {
+public class FilterBuilder<T extends DataEntity> extends FormBuilder<T> {
 	
 	private String lien="";
-	public FilterBuilder(DataEntity entity, HttpServletRequest request) {
+	private List<Field> interval=null;
+	
+	public FilterBuilder(T entity, HttpServletRequest request) {
 		super(entity, request);
 		defaultClassForContainer="form-group col-lg-4";
+		interval=new ArrayList<Field>();
 	}
 	
 	public String beginHTMLForm()throws Exception{
@@ -38,7 +43,17 @@ public class FilterBuilder extends HTMLBuilder {
 		reponse+="</div>";
 		return reponse;
 	}
-	
+	public void setInterval(String[]champs)throws Exception
+	{
+		Field field=null;
+		for(String champ:champs)
+		{
+			field=getEntity().getFieldByName(champ);
+			if(field==null)
+				throw new Exception("Champ "+champ+" introvable");
+			interval.add(field);
+		}
+	}
 	public String getLien() {
 		return lien;
 	}
