@@ -23,8 +23,9 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 	private String title=null;
 	
 	
-	public InsertUpdateBuilder(T entity,String cible,HttpServletRequest request){
+	public InsertUpdateBuilder(T entity,String cible,HttpServletRequest request) throws Exception{
 		super(entity,request);
+		this.entity=entity;
 		this.request=request;
 		this.cible=cible;
 		try{

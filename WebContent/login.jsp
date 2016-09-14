@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%@page import="utilitaire.SessionUtil"%>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -39,20 +40,29 @@
 		        <div class="login-wrap">
 		            <input type="text" name="login" class="form-control" placeholder="Utilisateur" autofocus>
 		            <br>
-		            <input type="password" name="password" class="form-control" placeholder="Mot de passe">
+		            <input type="password" name="passe" class="form-control" placeholder="Mot de passe">
 		            <%
-		            	if(request.getParameter("cible")!=null){
+		            String cible=SessionUtil.getValForAttr(request,"cible");
+		        	String currmenu=SessionUtil.getValForAttr(request,"currmenu");
+		        	String id=SessionUtil.getValForAttr(request,"id");
+		        	
+		            	if(cible!=null){
 		            %>
-		            	<input type="hidden" name="cible" value="<%=request.getParameter("cible")%>"/>
+		            	<input type="hidden" name="cible" value="<%=cible%>"/>
 		            <%
 		            }
 		            %>
 		            <%
-		            	if(request.getParameter("id")!=null){
+		            	if(id!=null){
 		            %>
-		            	<input type="hidden" name="id" value="<%=request.getParameter("id")%>"/>
+		            	<input type="hidden" name="id" value="<%=id%>"/>
 		            <%
 		            }
+		            if(currmenu!=null){
+			            %>
+			            	<input type="hidden" name="currmenu" value="<%=currmenu%>"/>
+			            <%
+			            }
 		            %>
 		            <!-- <label class="checkbox">
 		                <span class="pull-right">
@@ -64,11 +74,16 @@
 		            <hr>
 		            <%
 		            request.getSession().setAttribute("utilisateur", null);
-		            if(request.getParameter("error")!=null && request.getParameter("error")!=""){
+		            String erreur=request.getParameter("error");
+		            if(erreur==null || erreur.compareToIgnoreCase("null")==0){
+		            	erreur=(String)request.getAttribute("error");
+		            }
+		            
+		            if(erreur!=null && erreur!="" && erreur.compareToIgnoreCase("null")!=0){
 		            %>
 		            	<div class="alert alert-warning alert-dismissable">
 						  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						  <strong><%=request.getParameter("error") %></strong>
+						  <strong><%=erreur%></strong>
 						</div>
 		            <%}
 		            %>

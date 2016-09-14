@@ -29,7 +29,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	private Map<Field,Field> idchampForchamp=null;
 	private FilterBuilder filterBuilder=null;
 	
-	public TableBuilder(T entity,HttpServletRequest request){
+	public TableBuilder(T entity,HttpServletRequest request) throws Exception{
 		super(entity,request);
 		this.request=request;
 		classForEntete=new HashMap<Field,String>();
@@ -37,7 +37,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		idchampForchamp=new HashMap<Field,Field>();
 		setFilterBuilder(new FilterBuilder(entity, request));
 	}
-	public TableBuilder(T entity,ListPaginner<T> data,HttpServletRequest request){
+	public TableBuilder(T entity,ListPaginner<T> data,HttpServletRequest request) throws Exception{
 		this(entity,request);
 		this.setData(data);
 		this.request=request;
@@ -120,16 +120,13 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	}
 	private void testData()throws Exception{
 		actualPage=Integer.valueOf("0"+((request.getParameter("page")!=null) ? request.getParameter("page") : "1"));
-		if(actualPage<1)
+		if(actualPage<1){
 			actualPage=1;
-		if(data==null){
-			entity=getValue();
 			data=DaoModele.getInstance().findPageGenerique(actualPage, entity,apresWhere);
 		}
 	}
 	public String getFilterString() throws Exception{
 		String reponse="";
-		entity=getValue();
 		Field[]fields=entity.getAllFields();
 		for(Field f:fields)
 		{

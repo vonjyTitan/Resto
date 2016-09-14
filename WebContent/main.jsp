@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <%@page import="utilitaire.SessionUtil"%>
-<% try{
-      	SessionUtil.testSession(request);
+<% 
+	String cible=SessionUtil.getValForAttr(request,"cible");
+	String currmenu=SessionUtil.getValForAttr(request,"currmenu");
+	String id=SessionUtil.getValForAttr(request,"id");
+	try{
+      	SessionUtil.isExisteSession(request);
       }
       catch(Exception ex)
       {
-    	  %><script>document.location.replace("login.jsp?error=<%=ex.getMessage()%>&cible=<%=request.getParameter("cible")%>");</script><%
+    	  %><script>document.location.replace("login.jsp?error=<%=ex.getMessage()%>&cible=<%=cible%>&currmenu=<%=currmenu%>&id=<%=id%>");</script><%
+      		return ;
       }
+try{
+  	SessionUtil.testAcces(request);
+  }
+  catch(Exception ex)
+  {
+	  %><script language="JavaScript">
+         history.back();</script><%
+  		return ;
+  }
 %>
 <%try{%>
 <html lang="en">
@@ -213,9 +227,9 @@
               
               	  <p class="centered"><a href="profile.html"><img src="assets/img/icon2.png" class="img-circle" width="60"></a></p>
               	  <h5 class="centered">Administrateur</h5>
-              	  	<li class="mt"><a  href="main.jsp?cible=menu/categorie-saisie"><i class="fa fa-book"></i><span>Ajout categorie</span></a></li>
+              	  	<li class="mt"><a  href="main.jsp?cible=menu/categorie-saisie&currmenu=menu-cat-saisie" id="menu-cat-saisie"><i class="fa fa-book"></i><span>Ajout categorie</span></a></li>
                   <li class="mt">
-                      <a class="active" href="index.html">
+                      <a class="active" href="#" >
                           <i class="fa fa-dashboard"></i>
                           <span>Dashboard</span>
                       </a>
@@ -298,8 +312,6 @@
       <section id="main-content">
           <section class="wrapper">
           <%
-          	String cible=request.getParameter("cible");
-          	if(cible!=null && cible!=""){
           		cible="pages/"+cible+".jsp";
           		try{
           		%>
@@ -312,8 +324,6 @@
                         history.back();</script>
                     <%
                 }
-                    
-          	}
           %>
           </section>
       </section>
@@ -405,11 +415,18 @@
             var to = $("#" + id).data("to");
             console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
         }
+        $(document).ready(function () {
+        	$(".active").removeClass("active");
+        	<%if(currmenu!=null && currmenu.compareToIgnoreCase("null")!=0){%>
+        		$("#<%=currmenu%>").addClass("active");
+        	<%}%>
+        });
     </script>
   
 
   </body>
 </html>
+
 <%}
 catch(Exception ex){
 	

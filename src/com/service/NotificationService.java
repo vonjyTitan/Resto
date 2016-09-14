@@ -46,7 +46,7 @@ public class NotificationService {
 			}
 		}
 		Notification notif=new Notification(description,"",type,0,idutilisateur);
-		DaoModele.getInstance().save(notif, connex);
+		//DaoModele.getInstance().save(notif, connex);
 		
 	}
 	public void saveNotification(int type,int idutilisateur,DataEntity other)throws Exception{

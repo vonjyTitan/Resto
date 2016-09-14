@@ -16,7 +16,7 @@ public class FilterBuilder<T extends DataEntity> extends FormBuilder<T> {
 	private String lien="";
 	private List<Field> interval=null;
 	
-	public FilterBuilder(T entity, HttpServletRequest request) {
+	public FilterBuilder(T entity, HttpServletRequest request) throws Exception {
 		super(entity, request);
 		defaultClassForContainer="form-group col-lg-4";
 		interval=new ArrayList<Field>();

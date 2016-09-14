@@ -23,14 +23,13 @@ public class LoginService {
 	}
 	public boolean isAllowed(Utilisateur utilisateur,String activite)throws Exception{
 		List<RoleActivite> rep=DaoModele.getInstance().findPageGenerique(1, new RoleActivite(), " and idrole="+utilisateur.getIdrole()+" and activite='"+activite+"'");
-		if(rep.size()==0)
-			return false;
-		return true;
+		return rep.size()!=0;
 	}
 	public Utilisateur testLogin(String login,String passe)throws Exception{
 		Connection connex=null;
 		try{
 			connex=Connecteur.getConnection();
+			connex.setAutoCommit(false);
 			Utilisateur ob=new Utilisateur();
 			List<Utilisateur> rep=DaoModele.getInstance().findPageGenerique(1, ob,connex," and login='"+login.replace("'", "")+"' and passe='"+passe.replace("'", "")+"' and active=1");
 			if(rep.size()>0)

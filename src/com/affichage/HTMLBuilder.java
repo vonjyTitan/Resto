@@ -29,8 +29,9 @@ public class HTMLBuilder<T extends DataEntity> {
 	
 	protected String classForForm="form-horizontal style-form";
 	
-	public HTMLBuilder(T entity,HttpServletRequest request){
+	public HTMLBuilder(T entity,HttpServletRequest request) throws Exception{
 		this.entity=entity;
+		this.setEntity(getValue());
 		this.request=request;
 		notVisibleChamp=new ArrayList<String>();
 		fieldsAvalaible=new ArrayList<Field>();

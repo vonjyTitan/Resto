@@ -28,7 +28,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	private String defaultClassForInputContainer="col-sm-7";
 	private Map<Field,List<OptionObject>> typeSelectGenerique;
 	private Map<Field,String> classForChamp;
-	public FormBuilder(T entity, HttpServletRequest request) {
+	public FormBuilder(T entity, HttpServletRequest request) throws Exception {
 		super(entity, request);
 		typeSelectGenerique=new HashMap<Field,List<OptionObject>> ();
 		classForChamp=new HashMap<Field,String>();
