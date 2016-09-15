@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@page import="utilitaire.SessionUtil"%>
+<%@page import="com.mapping.Utilisateur"%>
 <% 
 	String cible=SessionUtil.getValForAttr(request,"cible");
 	String currmenu=SessionUtil.getValForAttr(request,"currmenu");
@@ -226,51 +227,117 @@ try{
               <ul class="sidebar-menu" id="nav-accordion">
               
               	  <p class="centered"><a href="profile.html"><img src="assets/img/icon2.png" class="img-circle" width="60"></a></p>
-              	  <h5 class="centered">Administrateur</h5>
-              	  <li class="mt"><a  href="main.jsp?cible=menu/categorie-saisie&currmenu=menu-cat-saisie" id="menu-cat-saisie"><i class="fa fa-book"></i><span>Ajout categorie</span></a></li>
-                   <li class="mt"><a  href="main.jsp?cible=configuration/liste-utilisateur&currmenu=menu-utilisateur-liste" id="menu-utilisateur-liste"><i class="fa fa-book"></i><span>Liste utilisateur</span></a></li>
+              	  <h5 class="centered"><%=((Utilisateur)request.getSession().getAttribute("utilisateur")).getNom()%></h5>
                   <li class="mt">
-                      <a class="active" href="#" >
+                      <a class="active" id="menu-ecceuil" href="main.jsp?cible=stat&currmenu=menu-ecceuil" >
                           <i class="fa fa-dashboard"></i>
-                          <span>Dashboard</span>
+                          <span>Acceuil</span>
                       </a>
                   </li>
 
                   <li class="sub-menu">
                       <a href="javascript:;" >
-                          <i class="fa fa-desktop"></i>
-                          <span>UI Elements</span>
+                          <i class="fa fa-cutlery"></i>
+                          <span>Commande</span>
                       </a>
                       <ul class="sub">
-                          <li><a  href="general.html">General</a></li>
-                          <li><a  href="buttons.html">Buttons</a></li>
-                          <li><a  href="panels.html">Panels</a></li>
+                          <li><a  href="general.html">Ajout commande</a></li>
+                          <li><a  href="buttons.html">Liste des commandes</a></li>
+                      </ul>
+                  </li>
+                  <li class="sub-menu">
+                      <a href="javascript:;" >
+                          <i class="fa fa-phone-square"></i>
+                          <span>Reservation</span>
+                      </a>
+                      <ul class="sub">
+                          <li><a  href="general.html">Liste des reservations</a></li>
+                          <li><a  href="buttons.html">Ajout reservation</a></li>
                       </ul>
                   </li>
 
                   <li class="sub-menu">
                       <a href="javascript:;" >
-                          <i class="fa fa-cogs"></i>
-                          <span>Components</span>
+                          <i class="fa fa-table"></i>
+                          <span>Table</span>
                       </a>
                       <ul class="sub">
-                          <li><a  href="calendar.html">Calendar</a></li>
-                          <li><a  href="gallery.html">Gallery</a></li>
-                          <li><a  href="todo_list.html">Todo List</a></li>
+                          <li><a  href="calendar.html">Liste des tables</a></li>
+                          <li><a  href="gallery.html">Ajout de table</a></li>
                       </ul>
                   </li>
                   <li class="sub-menu">
                       <a href="javascript:;" >
-                          <i class="fa fa-book"></i>
-                          <span>Extra Pages</span>
+                          <i class="fa fa-cog"></i>
+                          <span>Configuration stock</span>
                       </a>
                       <ul class="sub">
-                          <li><a  href="blank.html">Blank Page</a></li>
-                          <li><a  href="login.html">Login</a></li>
-                          <li><a  href="lock_screen.html">Lock Screen</a></li>
+	                      <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                          <i class="fa fa-object-group"></i>
+			                          <span>Categorie d'article</span>
+			                      </a>
+			                      <ul class="sub"><li><a  href="blank.html">Liste des categories</a></li>
+			                      <li><a href="main.jsp?cible=menu/categorie-saisie&currmenu=menu-cat-saisie" id="menu-cat-saisie">Ajout categorie</a><li>
+			                      </ul>
+	                      </li>
+                          <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                         <!--  <i class="fa fa-users"></i>-->
+			                          <span>Unite d'article</span>
+			                      </a>
+			                      <ul class="sub"><li><a  href="blank.html">Liste des unites</a></li>
+			                      </ul>
+	                      </li>
                       </ul>
                   </li>
                   <li class="sub-menu">
+                      <a href="javascript:;" >
+                          <i class="fa fa-cog"></i>
+                          <span>Configuration Generale</span>
+                      </a>
+                      <ul class="sub">
+	                      <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                            <i class="fa fa-users"></i>
+			                          <span>Utilisateur</span>
+			                      </a>
+			                      <ul class="sub"><li><a   href="main.jsp?cible=configuration/liste-utilisateur&currmenu=menu-utilisateur-liste" id="menu-utilisateur-liste">Liste des utilisateurs</a>
+			                      <li><a  href="blank.html">Ajout utilisateur</a>
+			                      </li>
+			                      </ul>
+	                      </li>
+                      </ul>
+                  </li>
+                  <li class="sub-menu">
+                      <a href="javascript:;" >
+                          <i class="fa fa-cog"></i>
+                          <span>Configuration Commande</span>
+                      </a>
+                      <ul class="sub">
+	                      <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                          <i class="fa fa-liste"></i>
+			                          <span>Menu</span>
+			                      </a>
+			                      <ul class="sub"><li><a  href="blank.html">Liste des menus</a>
+			                      <li><a  href="blank.html">Ajout menu</a>
+			                      </li>
+			                      </ul>
+	                      </li>
+	                      <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                          <i class="fa fa-object-group"></i>
+			                          <span>Classement de menu</span>
+			                      </a>
+			                      <ul class="sub"><li><a  href="blank.html">Liste des classements de menu</a>
+			                      <li><a  href="blank.html">Ajout classement</a>
+			                      </li>
+			                      </ul>
+	                      </li>
+                      </ul>
+                  </li>
+                  <!-- <li class="sub-menu">
                       <a href="javascript:;" >
                           <i class="fa fa-tasks"></i>
                           <span>Forms</span>
@@ -298,7 +365,7 @@ try{
                           <li><a  href="morris.html">Morris</a></li>
                           <li><a  href="chartjs.html">Chartjs</a></li>
                       </ul>
-                  </li>
+                  </li>-->
 
               </ul>
               <!-- sidebar menu end-->
