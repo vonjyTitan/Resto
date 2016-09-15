@@ -27,15 +27,15 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	protected String classForReset="btn btn-danger";
 	private String defaultClassForInputContainer="col-sm-7";
 	private Map<Field,List<OptionObject>> typeSelectGenerique;
-	private Map<Field,String> classForChamp;
+	private Map<Champ,String> classForChamp;
 	public FormBuilder(T entity, HttpServletRequest request) throws Exception {
 		super(entity, request);
 		typeSelectGenerique=new HashMap<Field,List<OptionObject>> ();
-		classForChamp=new HashMap<Field,String>();
+		classForChamp=new HashMap<Champ,String>();
 	}
 	public String getHTML() throws Exception{
 		String reponse=beginHTMLForm();
-		reponse+=HTMLBuilder.beginPanel("Formulaire general");
+		reponse+=HTMLBuilder.beginPanel("Formulaire general",12);
 		reponse+=getHTMLBody();
 		reponse+=getHTMLButton();
 		reponse+=HTMLBuilder.endPanel();
@@ -53,21 +53,21 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	}
 	public String getHTMLBody() throws Exception{
 		String reponse="";
-		for(Field f:fieldsAvalaible){
+		for(Champ f:fieldsAvalaible){
 			reponse+=blockFor(f,false); 
 		}
 		return reponse;
 	}
 	public String blockFor(String champ)throws Exception{
-		Field field=getEntity().getFieldByName(champ);
+		Champ field=getFieldByName(champ);
 		if(field==null)
 			throw new Exception("Champ "+champ+" introvable");
 		return blockFor(field,true);
 	}
-	public String blockFor(Field f,boolean withDelete)throws Exception{
+	public String blockFor(Champ f,boolean withDelete)throws Exception{
 		String reponse="";
 		if(isNotVisible(f)){
-			reponse+="<input type=\"hidden\" name=\""+nameForChamp(f)+"\" id=\""+nameForChamp(f)+"\" value=\""+defaultValudeForField(f)+"\" />";
+			reponse+="<input type=\"hidden\" name=\""+f.getName()+"\" id=\""+f.getName()+"\" value=\""+defaultValudeForField(f)+"\" />";
 			if(withDelete)
 				removeChamp(f.getName());
 			return reponse;
@@ -75,7 +75,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		reponse+="<div id=\""+f.getName().toLowerCase()+"container\" class=\""+defaultClassForContainer+"\">";
 		reponse+=labelleFor(f,defauldClassForLabel);
 		reponse+="<div class=\""+getDefaultClassForInputContainer()+"\">";
-		reponse+=inputFor(f, getClassForField(f),getAdditionForField(f),withDelete);
+		reponse+=inputFor(f, getClassForField(f.getName()),f.getAdditionnale(),withDelete);
 		reponse+="</div>";
 		reponse+="</div>";
 		return reponse;
@@ -110,12 +110,12 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		return labelleFor(champ,defauldClassForLabel);
 	}
 	public String labelleFor(String champ,String classe) throws Exception{
-		Field field=getEntity().getFieldByName(champ);
+		Champ field=getFieldByName(champ);
 		if(field==null)
 			throw new Exception("Champ "+champ+" introvable");
 		return labelleFor(field,classe);
 	}
-	public String labelleFor(Field f,String classe){
+	public String labelleFor(Champ f,String classe){
 		if(getEntity().findFormError()!=null){
 			String mess=getEntity().findFormError().get(f);
 			if(mess!=null && (showErrorMode==ERROR_SHOW.COLOR_ALL || showErrorMode==ERROR_SHOW.COLOR_LABELLE))
@@ -123,30 +123,46 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 				classe+=" "+getDefaultClassForError();
 			}
 		}
-		return "<div  class=\""+classe+"\"><label class=\"control-label\" for=\""+f.getName().toLowerCase()+"\" >"+getEntity().getLibelleForField(f)+" "+((getEntity().isFieldRequired(f)) ? "*" : "")+"</label></div>";
+		return "<div  class=\""+classe+"\"><label class=\"control-label\" for=\""+f.getName().toLowerCase()+"\" >"+f.getLibelle()+" "+((getEntity().isFieldRequired(f.getField())) ? "*" : "")+"</label></div>";
 	}
 	public String inputFor(String champ)throws Exception{
 		return inputFor(champ,defauldClassForInput);
 	}
+	public void renameChamp(String champ,String nom)throws Exception{
+		Champ f=getFieldByName(champ);
+		if(f==null)
+			throw new Exception("Champ "+champ+" introuvable");
+		f.setName(nom);
+	}
+	public void renameChamp(String []champ,String []nom)throws Exception{
+		if(champ.length!=nom.length)
+			throw new Exception("La longueur des de la table champ et nom doivent etre identique !");
+		for(int i=0;i<champ.length;i++)
+			renameChamp(champ[i],nom[i]);
+	}
+	
 	public String inputFor(String champ,String classe) throws Exception{
-		Field field=getEntity().getFieldByName(champ);
+		Champ field=getFieldByName(champ);
 		if(field==null)
 			throw new Exception("Champ "+champ+" introvable");
-		return inputFor(champ,classe,getAdditionForField(field));
+		return inputFor(champ,classe,field.getAdditionnale());
 	}
 	public String inputFor(String champ,String classe,String add) throws Exception{
-		Field field=getEntity().getFieldByName(champ);
+		Champ field=getFieldByName(champ);
 		if(field==null)
 			throw new Exception("Champ "+champ+" introvable");
 		if(classe==null){
-			classe=getClassForField(field);
+			classe=getClassForField(field.getField());
 		}
 		if(classe.isEmpty()){
-			classe=getClassForField(field);
+			classe=getClassForField(field.getField());
 		}
 		return inputFor(field,classe,add,true);
 	}
-	public String inputFor(Field f,String classe,String add,boolean withDelete)throws Exception{
+	public String inputFor(Champ f,String classe,String add,boolean withDelete)throws Exception{
+		Champ field=f;
+		if(field==null)
+			throw new Exception("Champ "+f+" introvable");
 		if(withDelete)
 			fieldsAvalaible.remove(f);
 		if(getEntity().findFormError()!=null){
@@ -156,15 +172,15 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 				classe+=" "+getDefaultClassForError();
 			}
 		}
-		String select=testSelectField(f,classe);
+		String select=testSelectField(field,classe);
 		String reponse="";
 		reponse+=select;
 		if(select.length()==0){
-			reponse+=getTypeForField(f)+" name=\""+nameForChamp(f)+"\" id=\""+nameForChamp(f)+"\" value=\""+defaultValudeForField(f)+"\" class=\""+getClassForField(f)+"\" "+add+">";
+			reponse+=getTypeForField(field)+" name=\""+field.getName()+"\" id=\""+field.getName()+"\" value=\""+defaultValudeForField(field)+"\" class=\""+getClassForField(f.getName())+"\" "+add+">";
 		}
 		return reponse;
 	}
-	private String getTypeForField(Field f)throws Exception{
+	private String getTypeForField(Champ f)throws Exception{
 		if(getEntity().isNumberType(f.getType())){
 			return "<input type=\"number\"";
 		}
@@ -173,13 +189,14 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 			return "<input type=\"text\"";
 		}
 		else if(f.getType().equals(Boolean.class) || f.getType().equals(boolean.class)){
-			if((boolean)getEntity().getValueForField(f)==true)
+			if((boolean)defaultValudeForField(f)==true)
 				return "<input type=\"checkbox\" checked=\"checked\"";
 			return "<input type=\"checkbox\" checked=\"\"";
 		}
 		return "<input type=\"text\"";
 	}
-	private String testSelectField(Field f,String classe) throws Exception{
+	
+	private String testSelectField(Champ f,String classe) throws Exception{
 		String reponse="";
 		List<OptionObject> generic;
 		String option="";
@@ -187,7 +204,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 			for(OptionObject objet:generic){
 				option+=objet.getDOMHTML();
 			}
-			reponse+="<select class=\""+classe+"\" name=\""+nameForChamp(f)+"\" id=\""+nameForChamp(f)+"\" "+getAdditionForField(f)+">";
+			reponse+="<select class=\""+classe+"\" name=\""+f.getName()+"\" id=\""+f.getName()+"\" "+f.getAdditionnale()+">";
 			reponse+=option;
 			reponse+="</select>";
 		}
@@ -204,7 +221,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		List<OptionObject> dat=new ArrayList<OptionObject>(); 
 		for(Entry<String, String> entry:fil)
 		{
-			dat.add(new OptionObject(entry.getKey(), entry.getValue(), field));
+			dat.add(new OptionObject(entry.getKey(), entry.getValue(), new Champ(field,field.getName(),entity,null)));
 		}
 		setChampSelect(field, dat);
 	}
@@ -216,7 +233,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		for(DataEntity object:data){
 			String id=String.valueOf(object.getValueForField(object.getFieldByName(map[0])));
 			String val=String.valueOf(object.getValueForField(object.getFieldByName(map[1])));
-			datar.add(new OptionObject(id, val, field));
+			datar.add(new OptionObject(id, val, new Champ(field,field.getName(),entity,null)));
 		}
 		setChampSelect(field,datar);
 	}
@@ -239,13 +256,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		}
 		return val;
 	}
-	protected Object defaultValudeForField(Field f) throws Exception{
-		Object val=getEntity().getValueForField(f);
-		if(val!=null){
-			return val;
-		}
-		return "";
-	}
+	
 	public String getDefaultClassForInputContainer() {
 		return defaultClassForInputContainer;
 	}
@@ -256,7 +267,12 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	{
 		Field field=getEntity().getFieldByName(champ);
 		if(field==null)
-			throw new Exception("Champ "+champ+" introuvable");
+		{
+			if(typeSelectGenerique.get(field)!=null){
+				return defaultClassForSelect;
+			}
+			return defauldClassForInput;
+		}
 		return getClassForField(field);
 	}
 	public void addClassForChamp(String champ,String classe)throws Exception{
@@ -264,7 +280,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		setClassForChamp(champ, last+" "+classe);
 	}
 	public void setClassForChamp(String champ,String classe) throws Exception{
-		Field field=getEntity().getFieldByName(champ);
+		Champ field=getFieldByName(champ);
 		if(field==null)
 			throw new Exception("Champ "+champ+" introuvable");
 		classForChamp.put(field, classe);
@@ -327,9 +343,9 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	public class OptionObject extends DataEntity{
 		private String id;
 		private String val;
-		private Field f;
+		private Champ f;
 		
-		OptionObject(String id,String val,Field f){
+		OptionObject(String id,String val,Champ f){
 			this.id=id;
 			this.val=val;
 			this.f=f;

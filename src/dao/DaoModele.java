@@ -173,7 +173,6 @@ public class DaoModele {
                 return this.findPageGenerique(((ListPaginner<DataEntity>)(reponse)).nbPage-1,objet,connection,apresWhere);
             
             String query=this.getRequette(page,nomTable,objet);
-            
             stat=connection.createStatement();
              rs=stat.executeQuery(query);
             reponse=resoudre(rs,objet);
@@ -423,7 +422,7 @@ public class DaoModele {
 					reponse+=" "+objet.getReferenceForField(entry.getKey())+"='"+text+"' and ";
 				}
 				else if(entry.getKey().getType().equals(String.class))  
-					reponse+=" "+objet.getReferenceForField(entry.getKey())+"='"+entry.getValue()+"' and";
+					reponse+=" "+objet.getReferenceForField(entry.getKey())+" like '"+entry.getValue()+"' and";
 				else 
 					reponse+=" "+objet.getReferenceForField(entry.getKey())+"="+entry.getValue()+" and";
 			}

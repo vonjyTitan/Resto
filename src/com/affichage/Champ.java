@@ -7,11 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.annotations.Required;
+import com.mapping.DataEntity;
 
 public class Champ {
 	private Field field=null;
-	private String nameField=null;
+	private String nameField="";
+	private String libelle="";
 	private Object value=null;
+	private String additionnale="";
+	private Class type=null;
 	
 	public Field getField() {
 		return field;
@@ -19,10 +23,10 @@ public class Champ {
 	public void setField(Field field) {
 		this.field = field;
 	}
-	public String getNameField() {
+	public String getName() {
 		return nameField;
 	}
-	public void setNameField(String name) {
+	public void setName(String name) {
 		this.nameField = name;
 	}
 	public Object getValue() {
@@ -31,9 +35,29 @@ public class Champ {
 	public void setValue(Object value) {
 		this.value = value;
 	}
-	public Champ(Field field,String name,Object value){
+	public Champ(Field field,String name,DataEntity entity,Object value){
 		this.field=field;
 		this.nameField=name;
 		this.value=value;
+		this.libelle=(field!=null) ? entity.getLibelleForField(field) : name;
+		this.type=(field!=null) ? field.getType() : null;
+	}
+	public String getLibelle() {
+		return libelle;
+	}
+	public void setLibelle(String libelle) {
+		this.libelle = libelle;
+	}
+	public String getAdditionnale() {
+		return additionnale;
+	}
+	public void setAdditionnale(String additionnale) {
+		this.additionnale = additionnale;
+	}
+	public Class getType() {
+		return type;
+	}
+	public void setType(Class type) {
+		this.type = type;
 	}
 }

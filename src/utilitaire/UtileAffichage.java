@@ -3,24 +3,42 @@ package utilitaire;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class UtileAffichage {
-	public static Object getNonNullValue(Object value,Field f){
-		if(f.getType().equals(String.class)){
+	public static Object getNonNullValue(Object value,Class f){
+		if(f.equals(String.class)){
 			if(value==null)
 				return "";
 			return value;
 		}
-		if(f.getType().equals(java.util.Date.class) || f.getType().equals(java.sql.Date.class)){
+		if(f.equals(java.util.Date.class) || f.equals(java.sql.Date.class)){
 			if(value==null){
 				return "";
 			}
 			return value;
 		}
 		return value;
+	}
+	public static Object parseFromRequest(Object value,Class type) throws ParseException{
+		if(type.equals(java.util.Date.class) || type.equals(java.sql.Date.class))
+		{
+			DateFormat form=new SimpleDateFormat("dd/MM/yyyy"); 
+			return form.parseObject((String) value);
+		}
+		else if (type.equals(int.class)){
+			return Integer.valueOf("0"+((String)value));
+		}
+		else if(type.equals(double.class) || type.equals(Double.class)){
+			return Double.valueOf("0"+((String)value));
+		}
+		else if(type.equals(float.class) || type.equals(Float.class)){
+			return Float.valueOf("0"+((String)value));
+		}
+		else return value;
 	}
 	public static String formatMoney(double nombre){
 		DecimalFormat myNumberFormat = new DecimalFormat("###,###.###");

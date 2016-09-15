@@ -1,6 +1,7 @@
 package com.mapping;
 
 import com.annotations.Entity;
+import com.annotations.Parameter;
 
 @Entity(reference="utilisateur",pkName="idutilisateur")
 public class Utilisateur extends DataEntity {
@@ -9,6 +10,7 @@ public class Utilisateur extends DataEntity {
 	private String prenom;
 	private String login;
 	private String passe;
+	@Parameter(libelle="Role de l'utilisateur",reference="idrole")
 	private int idrole;
 	public int getIdutilisateur() {
 		return idutilisateur;

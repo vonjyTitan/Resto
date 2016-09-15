@@ -35,7 +35,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		classForEntete=new HashMap<Field,String>();
 		lienForChamp=new HashMap<Field,String>();
 		idchampForchamp=new HashMap<Field,Field>();
-		setFilterBuilder(new FilterBuilder(entity, request));
+		setFilterBuilder(new FilterBuilder(entity, request,this));
 	}
 	public TableBuilder(T entity,ListPaginner<T> data,HttpServletRequest request) throws Exception{
 		this(entity,request);
@@ -53,41 +53,44 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		if(withcheckbox){
 			reponse+="<th></th>";
 		}
-		reponse+="<th>"+entity.getPkName()+"</th>";
-		for(Field f:fieldsAvalaible){
-			if(f.getName().compareToIgnoreCase(entity.getPkName())==0)
+		reponse+="<th>"+getFieldByName(entity.getPkName()).getLibelle()+"</th>";
+		for(Champ f:fieldsAvalaible){
+			if(f.getName().compareToIgnoreCase(entity.getPkName())==0 || isNotVisible(f))
 				continue;
-			reponse+="<th>"+getSigne(f)+" "+entity.getLibelleForField(f)+"</th>";
+			reponse+="<th>"+getSigne(f.getField())+" <a href=\""+getSimpleLien()+"&nomChampOrder="+f.getName()+"&ordering="+getOrderForField(f.getField())+"\"> "+f.getLibelle()+"<a></th>";
 		}
 		reponse+="<th>Options</th>";
-		reponse+="<tr>";
+		reponse+="</tr>";
 		reponse+="</thead>";
 		reponse+="<tbody>";
 		for(DataEntity ob:data)
 		{
 			reponse+="<tr>";
 			if(withcheckbox){
-				reponse+="<td><input type=\"checkbox\" value=\""+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"\" name=\""+entity.getPkName()+"\"/></td>";
+				reponse+="<td style=\"text-align:left;\"><input type=\"checkbox\" value=\""+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"\" name=\""+entity.getPkName()+"\"/></td>";
 			}
-			String idval="<td>"+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"</td>";
+			String idval="<td style=\"text-align:left;\">"+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"</td>";
 			if(lienForId!=null){
-				idval="<td><a href=\""+lienForId+"&id="+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"\">"+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"</a></td>";
+				idval="<td style=\"text-align:left;\"><a href=\""+lienForId+"&id="+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"\">"+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"</a></td>";
 			}
 			
 			reponse+=idval;
-			for(Field f:fieldsAvalaible){
-				if(f.getName().compareToIgnoreCase(entity.getPkName())==0)
+			for(Champ f:fieldsAvalaible){
+				if(f.getName().compareToIgnoreCase(entity.getPkName())==0 || isNotVisible(f))
 					continue;
-				Object value=ob.getValueForField(f);
-				if(f.getType().equals(Date.class) || f.getType().equals(java.sql.Date.class)){
+				Object value=ob.getValueForField(f.getField());
+				if(f.getField().getType().equals(Date.class) || f.getField().getType().equals(java.sql.Date.class)){
 					value=UtileAffichage.formatAfficherDate((java.sql.Date) value);
 				}
-				else if(f.getType().equals(Double.class) || f.getType().equals(double.class) || f.getType().equals(Float.class) || f.getType().equals(float.class)){
+				else if(f.getField().getType().equals(Double.class) || f.getField().getType().equals(double.class) || f.getField().getType().equals(Float.class) || f.getField().getType().equals(float.class)){
 					value=UtileAffichage.formatMoney((double) value);
 				}
-				reponse+="<td>"+getLienForField(f, value)+"</td>";
+				if(DataEntity.isNumberType(f.getField().getType()))
+					reponse+="<td>"+getLienForField(f.getField(), value)+"</td>";
+				else
+					reponse+="<td style=\"text-align:left;\">"+getLienForField(f.getField(), value)+"</td>";
 			}
-			reponse+="<td>"+ob.getOption()+"</td>";
+			reponse+="<td style=\"text-align:left;\">"+ob.getOption()+"</td>";
 			reponse+="</tr>";
 		}
 		reponse+="</tbody>";
@@ -105,34 +108,38 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		String reponse="<p>";
 		int page=((ListPaginner<T>)data).nbPage;
 		if(actualPage>1)
-			reponse+="<a href=\""+getLien()+"&page="+(actualPage-1)+"\"><< precedant</a>";
+			reponse+="<a href=\""+getCompletLien()+"&page="+(actualPage-1)+"\"><< precedant</a>";
 		for(int i=1;i<=page;i++){
 			if(i==actualPage){
 				reponse+=" "+i+" ";
 			}
 			else
-				reponse+="<a href=\""+getLien()+"&page="+i+"\"> "+i+" </a>";
+				reponse+="<a href=\""+getCompletLien()+"&page="+i+"\"> "+i+" </a>";
 		}
 		if(actualPage<page){
-			reponse+="<a href=\""+getLien()+"&page="+(actualPage+1)+"\"> suivant >></a>";
+			reponse+="<a href=\""+getCompletLien()+"&page="+(actualPage+1)+"\"> suivant >></a>";
 		}
 		return reponse+="</p>";
 	}
 	private void testData()throws Exception{
+		if(data!=null)
+			return;
 		actualPage=Integer.valueOf("0"+((request.getParameter("page")!=null) ? request.getParameter("page") : "1"));
 		if(actualPage<1){
-			actualPage=1;
-			data=DaoModele.getInstance().findPageGenerique(actualPage, entity,apresWhere);
+			actualPage=1;			
 		}
+		data=DaoModele.getInstance().findPageGenerique(actualPage, entity,apresWhere);
 	}
-	public String getFilterString() throws Exception{
+	public String getCompletFilterString() throws Exception{
+		return getSimpleFilterString()+"&nomChampOrder="+entity.findNomChampOrder()+"&ordering="+entity.findOrdering();
+	}
+	public String getSimpleFilterString() throws Exception{
 		String reponse="";
-		Field[]fields=entity.getAllFields();
-		for(Field f:fields)
+		//Field[]fields=entity.getAllFields();
+		for(Champ f:fieldsAvalaible)
 		{
-			reponse+="&"+nameForChamp(f)+"="+UtileAffichage.getNonNullValue(entity.getValueForField(f), f);
+			reponse+="&"+f.getName()+"="+UtileAffichage.getNonNullValue(super.defaultValudeForField(f), f.getType());
 		}
-		reponse+="&nomChampOrder="+entity.findNomChampOrder()+"&ordering="+entity.findOrdering();
 		return reponse;
 	}
 	public void setClassForEntete(String champ,String classe)throws Exception{
@@ -153,7 +160,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 			Object id=entity.getValueForField(fid);
 			return "<a href=\""+lienForChamp.get(f)+"&id="+id+"\">"+value+"</a>";
 		}
-		return (String) value;
+		return String.valueOf(value);
 	}
 	public void setLienForChamp(String champ,String lien,String nomidchamp) throws Exception{
 		Field fchamp=entity.getFieldByName(champ);
@@ -197,32 +204,28 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	public void setApresWhere(String apresWhere) {
 		this.apresWhere = apresWhere;
 	}
-	public String getLien() throws Exception {
+	public String getSimpleLien() throws Exception{
 		if(lien!="" && lien!=null)
 			return lien;
-		return request.getRequestURI()+"?cible="+request.getParameter("cible")+getFilterString();
+		return request.getRequestURI()+"?cible="+request.getParameter("cible")+getSimpleFilterString();
 	}
-	public String getLienWithOrder(Field f){
+	public String getCompletLien() throws Exception {
+		if(lien!="" && lien!=null)
+			return lien;
+		return request.getRequestURI()+"?cible="+request.getParameter("cible")+getCompletFilterString();
+	}
+	public String getOrderForField(Field f){
 		String lastChampOrder=entity.findNomChampOrder();
 		String lastOrder=entity.findOrdering();
-		try{
-			entity.setNomChampOrder(entity.getReferenceForField(f));
-			entity.setOrdering(DataEntity.ASC);
-			if(lastChampOrder.compareTo(entity.getReferenceForField(f))==0 && lastOrder==DataEntity.ASC)
-			{
-				entity.setOrdering(DataEntity.DESC);
-			}
-			return getLien();
-		}
-		catch(Exception ex)
+		if(lastChampOrder!=null && lastOrder!=null && lastChampOrder.compareTo(entity.getReferenceForField(f))==0 && DataEntity.ASC.contains(lastOrder))
 		{
-			
+			return DataEntity.DESC;
 		}
-		finally{
-			entity.setNomChampOrder(lastChampOrder);
-			entity.setOrdering(lastOrder);
-		}
-		return "";
+		return DataEntity.ASC;
+	}
+	public void setLibelleFor(String champ,String nom)throws Exception{
+		super.setLibelleFor(champ, nom);
+		getFilterBuilder().setLibelleFor(champ, nom);
 	}
 	public void setLien(String lien) {
 		this.lien = lien;
