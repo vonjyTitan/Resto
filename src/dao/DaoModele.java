@@ -202,9 +202,6 @@ public class DaoModele {
         while(rs.next()){
         	inter=(T) objet.getClass().newInstance();
         	for(int i=0;i<interv.length;i++){
-        		if(isBaseType((interv[i]).getType())==false){
-        			continue;
-        		}
         		String getting=setMaj(interv[i].getType().getSimpleName());
         		if(isExisteColonne(rs,inter.getReferenceForField(interv[i]))==false){
         			continue;
@@ -252,14 +249,6 @@ public class DaoModele {
     }
     public static String setMaj(String nom){
     	return nom.toUpperCase().substring(0, 1)+""+nom.substring(1);
-    }
-    public boolean isBaseType(Class classe){
-    	Class[] liste={int.class,Double.class,String.class,double.class,Number.class,java.util.Date.class,java.sql.Date.class,Boolean.class,boolean.class};
-    	for(int i=0;i<liste.length;i++){
-    		if(classe.getName()==liste[i].getName())
-    			return true;
-    	}
-    	return false;
     }
     boolean isExisteChamp(String champ,String nomTable,Connection conn) throws Exception{
     	Statement stat=null;
@@ -310,7 +299,7 @@ public class DaoModele {
 				{
 					if(isExisteChamp(data.get(0).getReferenceForField(champs[i]),data.get(0).findReference(),con)==false)continue;
 					if(champs[i].getName().compareToIgnoreCase(data.get(0).getPkName())==0)continue;
-					if(isBaseType(champs[i].getType())==false)continue;
+					
 					
 					Method m=null;
 					try{
@@ -373,7 +362,7 @@ public class DaoModele {
 		{
 			if(isExisteChamp(bm.getReferenceForField(fields[i]),bm.findReference(),conn)==false)continue;
 			if(fields[i].getName().compareToIgnoreCase(bm.getPkName())==0)continue;
-			if(isBaseType(fields[i].getType())==false)continue;
+			
 			if(index==true) 
 			{
 				champs=champs+", ";
@@ -502,8 +491,6 @@ public class DaoModele {
 		boolean isIndex=true;
 		
 		for(int i=0;i<attr.length;i++){
-			if(!isBaseType(attr[i].getType()))
-				continue;
 			if(attr[i].getName().compareToIgnoreCase(modele.getPkName())==0)
 				continue;
 			Object valeur=null;

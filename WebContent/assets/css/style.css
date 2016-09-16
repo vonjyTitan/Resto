@@ -1100,6 +1100,7 @@ PANELS CONFIGURATIONS
 	padding: 3px;
 	margin-bottom: 15px;
 	color: #c6c6c6;
+	text-align: center;
 }
 .white-panel .small {
 	font-size: 10px;
@@ -1617,6 +1618,7 @@ PANELS CONFIGURATIONS
     background: transparent;
     color: #797979;
 }
+
 .panel.terques-chart .chart-tittle .value {
     float: right;
     color: #fff;

@@ -23,18 +23,18 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	private String apresWhere="";
 	private String lien="";
 	private int actualPage=1;
-	private String classForTabe="table table-striped table-advance table-hover";
-	private Map<Field,String> classForEntete=null;
-	private Map<Field,String> lienForChamp=null;
-	private Map<Field,Field> idchampForchamp=null;
+	private String classForTabe="table table-striped table-advance table-hover table-bordered";
+	private Map<Champ,String> classForEntete=null;
+	private Map<Champ,String> lienForChamp=null;
+	private Map<Champ,Champ> idchampForchamp=null;
 	private FilterBuilder filterBuilder=null;
 	
 	public TableBuilder(T entity,HttpServletRequest request) throws Exception{
 		super(entity,request);
 		this.request=request;
-		classForEntete=new HashMap<Field,String>();
-		lienForChamp=new HashMap<Field,String>();
-		idchampForchamp=new HashMap<Field,Field>();
+		classForEntete=new HashMap<Champ,String>();
+		lienForChamp=new HashMap<Champ,String>();
+		idchampForchamp=new HashMap<Champ,Champ>();
 		setFilterBuilder(new FilterBuilder(entity, request,this));
 	}
 	public TableBuilder(T entity,ListPaginner<T> data,HttpServletRequest request) throws Exception{
@@ -45,7 +45,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	
 	public String getHTML(boolean withcheckbox) throws Exception{
 		testData();
-		String reponse="";
+		String reponse="<div class=\"col-lg-12 col-md-12 col-sm-12 table-responsive\">";
 		reponse+="<table class=\""+getClassForTabe()+"\">";
 		
 		reponse+="<thead>";
@@ -78,23 +78,26 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 			for(Champ f:fieldsAvalaible){
 				if(f.getName().compareToIgnoreCase(entity.getPkName())==0 || isNotVisible(f))
 					continue;
-				Object value=ob.getValueForField(f.getField());
+				Object value=null;
+				value=f.getMethodForChamp().invoke(ob, null);
 				if(f.getField().getType().equals(Date.class) || f.getField().getType().equals(java.sql.Date.class)){
 					value=UtileAffichage.formatAfficherDate((java.sql.Date) value);
 				}
 				else if(f.getField().getType().equals(Double.class) || f.getField().getType().equals(double.class) || f.getField().getType().equals(Float.class) || f.getField().getType().equals(float.class)){
 					value=UtileAffichage.formatMoney((double) value);
 				}
-				if(DataEntity.isNumberType(f.getField().getType()))
+				if(DataEntity.isNumberType(value.getClass()))
 					reponse+="<td>"+getLienForField(f.getField(), value)+"</td>";
 				else
 					reponse+="<td style=\"text-align:left;\">"+getLienForField(f.getField(), value)+"</td>";
 			}
+			ob.setLienForModif(entity.getLienForModif());
 			reponse+="<td style=\"text-align:left;\">"+ob.getOption()+"</td>";
 			reponse+="</tr>";
 		}
 		reponse+="</tbody>";
-		reponse+= "</table>";
+		reponse+= "</table>"
+				+ "</div>";
 		return reponse;
 	}
 	private String getSigne(Field f){
@@ -143,7 +146,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		return reponse;
 	}
 	public void setClassForEntete(String champ,String classe)throws Exception{
-		Field f=entity.getFieldByName(champ);
+		Champ f=getFieldByName(champ);
 		if(f==null)
 			throw new Exception("Champ "+champ+" introuvable");
 		classForEntete.put(f, classe);
@@ -155,16 +158,16 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	}
 	private String getLienForField(Field f,Object value) throws Exception{
 		String reponse="";
-		Field fid=idchampForchamp.get(f);
+		Champ fid=idchampForchamp.get(f);
 		if(fid!=null){
-			Object id=entity.getValueForField(fid);
+			Object id=entity.getValueForField(fid.getField());
 			return "<a href=\""+lienForChamp.get(f)+"&id="+id+"\">"+value+"</a>";
 		}
 		return String.valueOf(value);
 	}
 	public void setLienForChamp(String champ,String lien,String nomidchamp) throws Exception{
-		Field fchamp=entity.getFieldByName(champ);
-		Field fid=entity.getFieldByName(nomidchamp);
+		Champ fchamp=getFieldByName(champ);
+		Champ fid=getFieldByName(nomidchamp);
 		if(fchamp==null || fid==null)
 			throw new Exception("Champ "+champ+" ou "+nomidchamp+" introuvable");
 		lienForChamp.put(fchamp, lien);
@@ -225,7 +228,12 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	}
 	public void setLibelleFor(String champ,String nom)throws Exception{
 		super.setLibelleFor(champ, nom);
-		getFilterBuilder().setLibelleFor(champ, nom);
+		try{
+			getFilterBuilder().setLibelleFor(champ, nom);
+		}
+		catch(Exception ex){
+			
+		}
 	}
 	public void setLien(String lien) {
 		this.lien = lien;
@@ -241,5 +249,8 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	}
 	public void setFilterBuilder(FilterBuilder filterBuilder) {
 		this.filterBuilder = filterBuilder;
+	}
+	public void setLienForModif(String lienForModif) {
+		entity.setLienForModif(lienForModif);
 	}
 }

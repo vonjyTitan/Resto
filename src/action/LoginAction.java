@@ -38,6 +38,9 @@ public class LoginAction {
 		request.getSession().setAttribute("utilisateur", u);
 		return "ok";
 	}
+	public String modifRole(){
+		return "ok";
+	}
 	public String getCible() {
 		return cible;
 	}

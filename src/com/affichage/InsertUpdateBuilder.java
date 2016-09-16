@@ -45,8 +45,7 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 			reponse+="<script>document.title=\""+this.getTitle()+"\";</script>";
 		}		
 		 reponse+="<div class=\"row mt\">"
-		 	+"<div class=\"col-lg-12\">"
-		 	+"<div class=\"form-panel col-lg-12\">";
+		 	+"<div class=\"col-lg-12\">";
 		reponse+= "<form action=\""+cible+"\" method=\"POST\" name=\""+getEntity().getClass().getSimpleName().toLowerCase().toLowerCase()+"form\" id=\""+getEntity().getClass().getSimpleName().toLowerCase()+"form\" class=\""+classForForm+"\">";
 		try{
 			if(getEntity().findFormError()!=null){

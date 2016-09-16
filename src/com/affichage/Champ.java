@@ -2,6 +2,7 @@ package com.affichage;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ public class Champ {
 	private Object value=null;
 	private String additionnale="";
 	private Class type=null;
+	private Method methodForChamp=null;
+	private DataEntity entity=null;
 	
 	public Field getField() {
 		return field;
@@ -36,11 +39,26 @@ public class Champ {
 		this.value = value;
 	}
 	public Champ(Field field,String name,DataEntity entity,Object value){
+		this.entity=entity;
 		this.field=field;
 		this.nameField=name;
 		this.value=value;
 		this.libelle=(field!=null) ? entity.getLibelleForField(field) : name;
 		this.type=(field!=null) ? field.getType() : null;
+		if(field!=null){
+			try{
+				methodForChamp=entity.getClass().getMethod("get"+DataEntity.getToUp(field.getName()), null);
+			}
+			catch(Exception ex){
+				try {
+					methodForChamp=entity.getClass().getMethod("find"+DataEntity.getToUp(field.getName()), null);
+				} catch (NoSuchMethodException e) 
+				{
+					
+				}
+			}
+			
+		}
 	}
 	public String getLibelle() {
 		return libelle;
@@ -59,5 +77,14 @@ public class Champ {
 	}
 	public void setType(Class type) {
 		this.type = type;
+	}
+	public Method getMethodForChamp() {
+		return methodForChamp;
+	}
+	public void setMethodForChamp(Method methodForChamp) {
+		this.methodForChamp = methodForChamp;
+	}
+	public void setMethodForChamp(String methodForChamp) throws NoSuchMethodException, SecurityException {
+		this.methodForChamp = entity.getClass().getMethod(methodForChamp, null);
 	}
 }

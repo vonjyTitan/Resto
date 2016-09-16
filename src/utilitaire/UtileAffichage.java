@@ -19,7 +19,7 @@ public class UtileAffichage {
 			if(value==null){
 				return "";
 			}
-			return value;
+			return formatAfficherDate((java.util.Date) value);
 		}
 		return value;
 	}

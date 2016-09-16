@@ -13,9 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.ListenerNotFoundException;
 import javax.swing.text.DateFormatter;
 
 import com.annotations.Entity;
+import com.annotations.Extension;
 import com.annotations.NumberRestrict;
 import com.annotations.Parameter;
 import com.annotations.Required;
@@ -43,7 +45,9 @@ public abstract class DataEntity {
 	public static final String DESC=" desc ";
 	private  List<Field> summField=new ArrayList<Field>();
 	private  List<Field> groupField=new ArrayList<Field>();
+	private static Map<Class,Field[]> fieldsForClasses=new HashMap<Class,Field[]>();
 	private int count=0;
+	private String lienForModif="";
 	public int findPackSize() {
 		return packSize;
 	}
@@ -292,17 +296,21 @@ public abstract class DataEntity {
 	public Field[] getAllFields(){
 		if(fields!=null)
 			return fields;
+		if(fieldsForClasses.containsKey(self))
+			return fields=fieldsForClasses.get(self);
 		Class classe=self;
 		List<Field> lc=new ArrayList<Field>(); 
 		Field[]inter=null;
-		while(classe!=DataEntity.class){
+		while(classe!=DataEntity.class && classe.getAnnotation(Extension.class)==null){
 			inter=classe.getDeclaredFields();
 			for(Field f:inter){
-				lc.add(f);
+				if(isBaseType(f.getType()))
+					lc.add(f);
 			}
 			classe=classe.getSuperclass();
 		}
-		return (fields=lc.toArray(new Field[]{}));
+		fieldsForClasses.put(self, fields=lc.toArray(new Field[]{}));
+		return fields;
 	}
 	public boolean isBaseType(Class classe){
     	Class[] liste={int.class,Double.class,String.class,double.class,Number.class,java.util.Date.class,java.sql.Date.class,Boolean.class,boolean.class};
@@ -368,7 +376,10 @@ public abstract class DataEntity {
 	public Object getPkValue() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		return  this.getValueForField(this.getFieldByName(this.getPkName()));
 	}
-	public String getOption(){
+	public String getOption() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		if(lienForModif!=null && !lienForModif.isEmpty()){
+			return " <a href=\""+lienForModif+"&id="+getValueForField(getFieldByName(getPkName()))+"\" class=\"btn btn-primary btn-xs\"><i class=\"fa fa-pencil\"></i></a> ";
+		}
 		return "";
 	}
 	public void addCountChamp(String champ)throws Exception{
@@ -402,7 +413,7 @@ public abstract class DataEntity {
 				return true;
 		return false;
 	}
-	private String getToUp(String str){
+	public static String getToUp(String str){
 		return  str.substring(0, 1).toUpperCase()+str.substring(1);
 	}
 	
@@ -464,6 +475,18 @@ public abstract class DataEntity {
 
 	public void setGroupField(List<Field> entetField) {
 		this.groupField = entetField;
+	}
+
+	public static boolean isDateType(Class type) {
+		return type.equals(java.util.Date.class) || type.equals(java.sql.Date.class);
+	}
+
+	public String getLienForModif() {
+		return lienForModif;
+	}
+
+	public void setLienForModif(String lienForModif) {
+		this.lienForModif = lienForModif;
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.mapping;
 
+import java.lang.reflect.InvocationTargetException;
+
 import com.annotations.Entity;
 import com.annotations.Parameter;
 
@@ -10,6 +12,7 @@ public class Utilisateur extends DataEntity {
 	private String prenom;
 	private String login;
 	private String passe;
+	private int active;
 	@Parameter(libelle="Role de l'utilisateur",reference="idrole")
 	private int idrole;
 	public int getIdutilisateur() {
@@ -47,6 +50,25 @@ public class Utilisateur extends DataEntity {
 	}
 	public void setIdrole(int idrole) {
 		this.idrole = idrole;
+	}
+	public int getActive() {
+		return active;
+	}
+	public void setActive(int active) {
+		this.active = active;
+	}
+	public String findActive(){
+		if(active==1)
+			return "<span class=\"label label-success label-mini\">active</span>";
+		return "<span class=\"label label-danger label-mini\">desactive</span>";
+	}
+	public String getOption() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		String reponse=super.getOption();
+		if(active==2){
+			reponse+= "<a class=\"btn btn-success btn-xs\" href=\"activeCompte?id="+getIdutilisateur()+"\"><i class=\"fa fa-check\"></i></a>";
+		}
+		else reponse+="<a class=\"btn btn-danger btn-xs\" href=\"desactiveCompte?id="+getIdutilisateur()+"\"><i class=\"fa fa-trash-o \"></i></a>";
+		return reponse;
 	}
 	
 }
