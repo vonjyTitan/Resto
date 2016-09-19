@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import dao.DaoModele;
+import utilitaire.SessionUtil;
+
 import com.mapping.DataEntity;
 
 public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
@@ -25,20 +27,20 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 	
 	public InsertUpdateBuilder(T entity,String cible,HttpServletRequest request) throws Exception{
 		super(entity,request);
-		this.entity=entity;
 		this.request=request;
 		this.cible=cible;
+		
+	}
+	
+	public String beginHTMLForm()throws Exception{
 		try{
-			if(request.getParameter("erreur")!=null){
-				setEntity(getValue());
+			if(SessionUtil.getValForAttr(request, "erreur")!=null){
+				entity.isValide();
 			}
 		}
 		catch(Exception ex){
 			ex.printStackTrace();
 		}
-	}
-	
-	public String beginHTMLForm()throws Exception{
 		String reponse="";
 		if(this.getTitle()!=null) {
 			reponse+="<h3><i class=\"fa fa-angle-right\"></i> "+this.getTitle()+"</h3>";
@@ -74,10 +76,10 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 	
 	public void setValueFromDatabase(Object object)throws Exception{
 		if(request.getParameter("erreur")==null){
-			List<DataEntity> l=DaoModele.getInstance().findPageGenerique(1, (DataEntity) getEntity()," and "+getEntity().getPkName()+"="+object);
-			if(l.size()==0)
+			DataEntity l=DaoModele.getInstance().findById((DataEntity) getEntity(),Integer.valueOf((String)object));
+			if(l==null)
 				throw new Exception("Objet introuvable");
-			setEntity((T) l.get(0));
+			setEntity((T) l);
 		}
 	}
 	
@@ -86,11 +88,6 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 	}
 	public void setShowErrorMode(ERROR_SHOW showErrorMode) {
 		this.showErrorMode = showErrorMode;
-	}
-	@Override
-	public void setEntity(T entity) throws Exception {
-		super.setEntity(entity);
-		this.getEntity().isValide();
 	}
 
 	public String getTitle() {

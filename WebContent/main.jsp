@@ -302,8 +302,8 @@ try{
 			                            <i class="fa fa-users"></i>
 			                          <span>Utilisateur</span>
 			                      </a>
-			                      <ul class="sub"><li><a   href="main.jsp?cible=configuration/liste-utilisateur&currmenu=menu-utilisateur-liste" id="menu-utilisateur-liste">Liste des utilisateurs</a>
-			                      <li><a  href="blank.html">Ajout utilisateur</a>
+			                      <ul class="sub"><li><a class="active"  href="main.jsp?cible=configuration/liste-utilisateur&currmenu=menu-utilisateur-liste" id="menu-utilisateur-liste">Liste des utilisateurs</a>
+			                      <li><a  href="main.jsp?cible=configuration/utilisateur-ajout&currmenu=menu-utilisateur-ajout" id="menu-utilisateur-ajout">Ajout utilisateur</a>
 			                      </li>
 			                      </ul>
 	                      </li>
@@ -483,12 +483,65 @@ try{
             var to = $("#" + id).data("to");
             console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
         }
+        var defaults = {
+    			classParent	 : 'dcjq-parent',
+    			classActive	 : 'active',
+    			classArrow	 : 'dcjq-icon',
+    			classCount	 : 'dcjq-count',
+    			classExpand	 : 'dcjq-current-parent',
+    			eventType	 : 'click',
+    			hoverDelay	 : 300,
+    			menuClose     : true,
+    			autoClose    : true,
+    			autoExpand	 : false,
+    			speed        : 'slow',
+    			saveState	 : true,
+    			disableLink	 : true,
+    			showCount : false,
+//    			cookie	: 'dcjq-accordion'
+    		};
+        var obj = this;
+        function autoCloseAccordion($parentsLi, $parentsUl){
+			$('ul',obj).not($parentsUl).slideUp(defaults.speed);
+			// Reset active links
+			$('a',obj).removeClass(defaults.classActive);
+			$('> a',$parentsLi).addClass(defaults.classActive);
+			$('> ul',$parentsLi).slideToggle(defaults.speed);
+		}
         $(document).ready(function () {
         	$(".active").removeClass("active");
         	<%if(currmenu!=null && currmenu.compareToIgnoreCase("null")!=0){%>
-        		$("#<%=currmenu%>").addClass("active");
+        	active($("#<%=currmenu%>"));
         	<%}%>
         });
+        function active(dom)
+        {
+        	$activeLi = dom.parent('li');
+			$parentsLi = $activeLi.parents('li');
+			$parentsUl = $activeLi.parents('ul');
+
+			// Prevent browsing to link if has child links
+			if(defaults.disableLink == true){
+				if(dom.siblings('ul').length >0){
+					e.preventDefault();
+				}
+			}
+
+			// Auto close sibling menus
+			if(defaults.autoClose == true){
+				autoCloseAccordion($parentsLi, $parentsUl);
+			}
+
+			if ($('> ul',$activeLi).is(':visible')){
+				$('ul',$activeLi).slideUp(defaults.speed);
+				$('a',$activeLi).removeClass(defaults.classActive);
+			} else {
+				$(dom).siblings('ul').slideToggle(defaults.speed);
+				$('> a',$activeLi).addClass(defaults.classActive);
+			}
+        	
+        }
+        
     </script>
   
 

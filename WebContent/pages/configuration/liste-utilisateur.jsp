@@ -7,16 +7,18 @@
 <jsp:include page='../verificateur.jsp'/>
 <%
 	TableBuilder builder=new TableBuilder(new Utilisateur(),request);
+	builder.getEntity().setNomTable("utilisateur_libelle");
 	builder.setLienForModif("main.jsp?cible=configuration/utilisateur-modif");
-	builder.getFilterBuilder().removeChamp(new String[]{"login","passe","idutilisateur"});
+	builder.getFilterBuilder().removeChamp(new String[]{"login","passe"});
 	Map<String,String> active=new HashMap<String,String>();
 	active.put("1", "Active");
 	active.put("2", "Desactive");
 	builder.getFilterBuilder().setChampSelect("active", active);
-	builder.getFilterBuilder().setChampSelect("idrole", new Role(), new String[]{"idrole","libelle"});
-	builder.addNotVisibleChamp(new String[]{"login","passe"});
+	builder.addNotVisibleChamp(new String[]{"login","passe","idrole"});
 	builder.setLibelleFor("idutilisateur", "Id");
 	builder.getFieldByName("active").setMethodForChamp("findActive");
+	builder.setOrdre(new String[]{"idutilisateur","nom","prenom","role","active"});
+	builder.setLienForId("main.jsp?cible=configuration/utilisateur-fiche");
 %>
 <%=builder.getFilterBuilder().getHTML()%>
 <%=HTMLBuilder.beginPanel("liste informations",12) %>

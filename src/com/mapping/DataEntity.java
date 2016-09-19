@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,9 @@ import com.annotations.NumberRestrict;
 import com.annotations.Parameter;
 import com.annotations.Required;
 import com.annotations.StringRestrict;
+
+import dao.DaoModele;
+
 import com.annotations.DateRestrict;
 
 public abstract class DataEntity {
@@ -45,6 +49,7 @@ public abstract class DataEntity {
 	public static final String DESC=" desc ";
 	private  List<Field> summField=new ArrayList<Field>();
 	private  List<Field> groupField=new ArrayList<Field>();
+	private Map<Field,String> referenceForField=new HashMap<Field,String>();
 	private static Map<Class,Field[]> fieldsForClasses=new HashMap<Class,Field[]>();
 	private int count=0;
 	private String lienForModif="";
@@ -117,11 +122,24 @@ public abstract class DataEntity {
 		return entity.reference();
 	}
 	public String getReferenceForField(Field field){
+		if(referenceForField.containsKey(field))
+			return referenceForField.get(field);
 		Parameter annotation=field.getAnnotation(Parameter.class);
 		String fname=field.getName();
 		if(annotation==null)
 			return fname;
 		return (annotation.reference().isEmpty()) ? fname : annotation.reference();
+	}
+	public void setReferenceForField(String champ,String reference) throws Exception
+	{
+		Field f=getFieldByName(champ);
+		if(f==null)
+			throw new Exception("Champ "+champ+" introuvable");
+		setReferenceForField(f,reference);
+	}
+	public void setReferenceForField(Field champ,String reference)
+	{
+		referenceForField.put(champ, reference);
 	}
 	public String getLibelleForField(Field field){
 		Parameter annotation=field.getAnnotation(Parameter.class);
@@ -200,10 +218,17 @@ public abstract class DataEntity {
 			return;
 		String val=(String)value;
 		int l=val.length();
-		if(l>restriction.maxLength() && restriction.maxLength()>0 || val.length()<restriction.minLength()){
-			formError.put(f, (restriction.messageOnNoInvalide().isEmpty()) ? "La longueur du champ "+getLibelleForField(f)
-			+" doit etre entre "+restriction.minLength()+" et "+restriction.minLength() :
-				restriction.messageOnNoInvalide()
+		String message=restriction.messageOnNoInvalide();
+		if(l>restriction.maxLength() && restriction.maxLength()>0 ){
+			formError.put(f, (message.isEmpty()) ? "La longueur du champ "+getLibelleForField(f)
+			+" doit etre inferieur a "+restriction.maxLength() :
+				message
+					);
+		}
+		else if( val.length()<restriction.minLength()){
+			formError.put(f, (message.isEmpty()) ? "La longueur du champ "+getLibelleForField(f)
+			+" doit etre superieur a "+restriction.minLength() :
+				message
 					);
 		}
 	}
@@ -320,7 +345,7 @@ public abstract class DataEntity {
     	}
     	return false;
     }
-	public Map<Field,Object> getFieldsFilter(){
+	public Map<Field,Object> getFieldsFilter(Connection conn) throws Exception{
 		Map<Field,Object> reponse=new HashMap<Field,Object>();
 		Field[]fields=this.getAllFields();
 		Method met=null;
@@ -329,6 +354,8 @@ public abstract class DataEntity {
 		
 		for(Field f:getAllFields()){
 			if(!isBaseType(f.getType()))
+				continue;
+			if(!DaoModele.getInstance().isExisteChamp(this.getReferenceForField(f), findReference(), conn))
 				continue;
 			try{
 				met=cl.getMethod("get"+getToUp(f.getName()), null);

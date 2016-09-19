@@ -17,6 +17,7 @@ import com.affichage.InsertUpdateBuilder.ERROR_SHOW;
 import com.mapping.DataEntity;
 
 import dao.DaoModele;
+import utilitaire.SessionUtil;
 import utilitaire.UtileAffichage;
 
 public class HTMLBuilder<T extends DataEntity> {
@@ -59,15 +60,16 @@ public class HTMLBuilder<T extends DataEntity> {
 			setLibelleFor(champ[i],nom[i]);
 	}
 	public static String beginPanel(String title,int taille){
-		return "<div class=\"col-lg-"+taille+" col-md-"+taille+" col-sm-"+taille+" mb\">"
-				+"<div class=\"panel pn box-solid\">"
- 		+"<div class=\"blue-header\"><h5>"+title+"</h5></div>";
+		return "<div class=\"col-lg-"+taille+" col-md-"+taille+" col-sm-"+taille+" mt\">"
+				+"<div class=\"panel panel-primary box-solid\">"
+ 		+"<div class=\"blue-header\"><h5>"+title+"</h5></div><div class=\"panel-body form-horizontal style-form\">";
 	}
 	public static String beginPanel(String title){
 		return beginPanel(title,6);
 	}
 	public static String endPanel(){
 		return "</div>"
+				+ "</div>"
 				+ "</div>";
 	}
 	
@@ -99,6 +101,7 @@ public class HTMLBuilder<T extends DataEntity> {
 		return entity;
 	}
 	public void setEntity(T entity)throws Exception  {
+		entity.setNomTable(this.entity.findReference());
 		this.entity = entity;
 	}
 	protected Object defaultValudeForField(Champ f) throws Exception{
@@ -119,16 +122,16 @@ public class HTMLBuilder<T extends DataEntity> {
 		//Field[] fields=reponse.getAllFields();
 		for(Champ field:fieldsAvalaible)
 		{
-			if(request.getParameter(field.getName())!=null)
+			if(SessionUtil.getValForAttr(request,field.getName())!=null)
 			{
-				if(request.getParameter(field.getName()).isEmpty())
+				if(SessionUtil.getValForAttr(request,field.getName()).isEmpty())
 					continue;
 				//test 
 				if(field.getField()==null){
-					field.setValue(UtileAffichage.parseFromRequest(request.getParameter(field.getName()),field.getType()));
+					field.setValue(UtileAffichage.parseFromRequest(SessionUtil.getValForAttr(request,field.getName()),field.getType()));
 					continue;
 				}
-				reponse.setValueForField(field.getField(), UtileAffichage.parseFromRequest(request.getParameter(field.getName()),field.getType()));
+				reponse.setValueForField(field.getField(), UtileAffichage.parseFromRequest(SessionUtil.getValForAttr(request,field.getName()),field.getType()));
 			}
 		}
 		if(request.getParameter("nomChampOrder")!=null)
@@ -138,6 +141,19 @@ public class HTMLBuilder<T extends DataEntity> {
 			if(!request.getParameter("ordering").isEmpty() && request.getParameter("ordering").compareToIgnoreCase("null")!=0)
 				reponse.setOrdering(request.getParameter("ordering"));
 		return reponse;
+	}
+	public void setOrdre(String[] ordre){
+		int rang=0;
+		for(String s:ordre)
+		{
+			Champ champ=getFieldByName(s);
+			if(champ!=null)
+			{
+				fieldsAvalaible.remove(champ);
+				fieldsAvalaible.add(rang, champ);
+				rang++;
+			}
+		}
 	}
 	public void addNotVisibleChamp(String champ){
 		addNotVisibleChamp(new String[]{champ});

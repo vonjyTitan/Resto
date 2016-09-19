@@ -35,7 +35,7 @@
 	  <div id="login-page">
 	  	<div class="container">
 	  	
-		      <form class="form-login" action="testLogin" method="POST">
+		      <form class="form-login" action="Action?to=login-testLogin" method="POST">
 		        <h2 class="form-login-heading">Authentification</h2>
 		        <div class="login-wrap">
 		            <input type="text" name="login" class="form-control" placeholder="Utilisateur" autofocus>
@@ -74,10 +74,7 @@
 		            <hr>
 		            <%
 		            request.getSession().setAttribute("utilisateur", null);
-		            String erreur=request.getParameter("error");
-		            if(erreur==null || erreur.compareToIgnoreCase("null")==0){
-		            	erreur=(String)request.getAttribute("error");
-		            }
+		            String erreur=SessionUtil.getValForAttr(request,"erreur");
 		            
 		            if(erreur!=null && erreur!="" && erreur.compareToIgnoreCase("null")!=0){
 		            %>

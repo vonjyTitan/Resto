@@ -1,6 +1,7 @@
 package com.affichage;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +13,11 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import com.affichage.InsertUpdateBuilder.ERROR_SHOW;
+import com.annotations.SELECT_TYPE;
 import com.mapping.DataEntity;
+import com.mapping.OptionObject;
 
+import dao.Connecteur;
 import dao.DaoModele;
 
 public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
@@ -54,11 +58,24 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		return reponse;
 	}
 	public String getHTMLBody() throws Exception{
-		String reponse="";
-		for(Champ f:fieldsAvalaible){
-			reponse+=blockFor(f,false); 
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(entity.findDataBaseKey());
+			String reponse="";
+			for(Champ f:fieldsAvalaible){
+				if(!DaoModele.getInstance().isExisteChamp(entity.getReferenceForField(f.getField()), entity.findReference(), conn))
+					continue;
+				reponse+=blockFor(f,false); 
+			}
+			return reponse;
 		}
-		return reponse;
+		catch(Exception ex){
+			throw ex;
+		}
+		finally{
+			if(conn!=null)
+				conn.close();
+		}
 	}
 	
 	public String blockFor(String champ)throws Exception{
@@ -193,19 +210,32 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	}
 	
 	private String testSelectField(Champ f,String classe) throws Exception{
-		String reponse="";
-		List<OptionObject> generic;
-		String option="";
-		if((generic=typeSelectGenerique.get(f))!=null){
-			if(this.getClass().equals(FilterBuilder.class))
-				option+="<option value=\"\">Tous</option>";
-			for(OptionObject objet:generic){
-				option+=objet.getDOMHTML();
-			}
-			reponse+="<select class=\""+classe+"\" name=\""+f.getName()+"\" id=\""+f.getName()+"\" "+f.getAdditionnale()+">";
-			reponse+=option;
-			reponse+="</select>";
+		List<OptionObject> data;
+		
+		if((data=typeSelectGenerique.get(f))!=null){
+			return buildSelect(f,data,classe,false);
 		}
+		if(f.isForeignKey() && f.getFk().selecttype()==SELECT_TYPE.OPTION)
+		{
+			return buildSelect(f,f.getForeignKeyData(),classe,f.getFk().nullable());
+		}
+		return "";
+	}
+	private String buildSelect(Champ f,List<OptionObject> data,String classe,boolean nullable) throws Exception{
+		String reponse="";
+		String option="";
+		if(this.getClass().equals(FilterBuilder.class))
+			option+="<option value=\"\">Tous</option>";
+		else if(nullable)
+		{
+			option+="<option value=\"\"> -- </option>";
+		}
+		for(OptionObject objet:data){
+			option+=objet.getOptionHTML(defaultValudeForField(f));
+		}
+		reponse+="<select class=\""+classe+"\" name=\""+f.getName()+"\" id=\""+f.getName()+"\" "+f.getAdditionnale()+">";
+		reponse+=option;
+		reponse+="</select>";
 		return reponse;
 	}
 	public void setChampSelect(Champ field,List<OptionObject> data) throws Exception{
@@ -219,7 +249,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		List<OptionObject> dat=new ArrayList<OptionObject>(); 
 		for(Entry<String, String> entry:fil)
 		{
-			dat.add(new OptionObject(entry.getKey(), entry.getValue(), field));
+			dat.add(new OptionObject(entry.getKey(), entry.getValue()));
 		}
 		setChampSelect(field, dat);
 	}
@@ -231,7 +261,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		for(DataEntity object:data){
 			String id=String.valueOf(object.getValueForField(object.getFieldByName(map[0])));
 			String val=String.valueOf(object.getValueForField(object.getFieldByName(map[1])));
-			datar.add(new OptionObject(id, val,field));
+			datar.add(new OptionObject(id, val));
 		}
 		setChampSelect(field,datar);
 	}
@@ -338,21 +368,5 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	public void setClassForForm(String classForForm) {
 		this.classForForm = classForForm;
 	}
-	public class OptionObject extends DataEntity{
-		private String id;
-		private String val;
-		private Champ f;
-		
-		OptionObject(String id,String val,Champ f){
-			this.id=id;
-			this.val=val;
-			this.f=f;
-		}
-		public String getDOMHTML() throws Exception{
-			String selected=String.valueOf(defaultValudeForField(f));
-			if(selected.equals(id))
-				return "<option selected value=\""+id+"\">"+val+"</option>";
-			return "<option value=\""+id+"\">"+val+"</option>";
-		}
-	}
+	
 }

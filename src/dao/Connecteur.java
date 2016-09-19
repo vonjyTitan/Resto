@@ -65,7 +65,7 @@ public class Connecteur
 		if(dataBaseList==null)
 		{
 			
-			ResourceBundle configuration=ConfigUtil.getBundle();
+			ResourceBundle configuration=ConfigUtil.getConfigBundle();
 			dataBaseList=new HashMap<String,ComboPooledDataSource>();
 			dataBaseTypeList=new HashMap<String,DatabaseType>();
 			

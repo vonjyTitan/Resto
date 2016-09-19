@@ -36,6 +36,10 @@
             <result name="ok">/main.jsp</result>
             <result name="error">/login.jsp</result>
       </action>
+       <action name="ajoutUtilisateur" class="action.LoginAction"  method="ajoutUtilisateur">
+            <result name="ok">/main.jsp?cible=configuration/liste-utilisateur</result>
+            <result name="error">/main.jsp?cible=configuration/ajout-utilisateur</result>
+      </action>
 <!-- debut vraie -->
 
 	<!-- <action name="oublier">

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Mer 14 Septembre 2016 à 05:46
+-- Généré le: Dim 18 Septembre 2016 à 18:15
 -- Version du serveur: 5.5.24-log
 -- Version de PHP: 5.3.13
 
@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS `role` (
 --
 
 INSERT INTO `role` (`idrole`, `libelle`, `description`) VALUES
-(1, 'Caissier', 'utilisateur permanant de l''application');
+(1, 'Super admin', 'super administrateur'),
+(2, 'Caissier', 'utilisateur permanant de l''application');
 
 -- --------------------------------------------------------
 
@@ -57,7 +58,17 @@ CREATE TABLE IF NOT EXISTS `roleactivite` (
 
 INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'stat'),
-(1, 'menu/categorie-saisie');
+(1, 'menu/categorie-saisie'),
+(1, 'configuration/liste-utilisateur'),
+(2, 'stat'),
+(2, 'menu/categorie-saisie'),
+(1, 'configuration/utilisateur-modif'),
+(1, 'configuration/utilisateur-ajout'),
+(1, 'configuration/utilisateur-fiche'),
+(1, 'login-ajoutUtilisateur'),
+(1, 'login-modif'),
+(1, 'login-active'),
+(1, 'login-desactive');
 
 -- --------------------------------------------------------
 
@@ -66,7 +77,7 @@ INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `utilisateur` (
-  `idutilisateur` int(11) NOT NULL,
+  `idutilisateur` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(50) NOT NULL,
   `prenom` varchar(50) NOT NULL,
   `login` varchar(50) NOT NULL,
@@ -74,14 +85,41 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `idrole` int(11) NOT NULL,
   `active` int(11) NOT NULL,
   PRIMARY KEY (`idutilisateur`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
 --
 -- Contenu de la table `utilisateur`
 --
 
 INSERT INTO `utilisateur` (`idutilisateur`, `nom`, `prenom`, `login`, `passe`, `idrole`, `active`) VALUES
-(1, 'vonjy', 'vonjy', 'vonjy', 'vonjy', 1, 1);
+(1, 'vonjy', 'vonjy', 'vonjy', 'nw6KzVSMEfayNp8BpNH7lQ==', 1, 1),
+(2, 'test', 'test', 'test', '5RV2UXq8iOlROXgqefVjrg==', 2, 1),
+(3, 'johan', 'johan', 'johan', 'wYwDOV7IT8/0SUmB4m4Rfg==', 1, 1),
+(4, 'rova', 'rova', 'rova', 'xjbdZIpNi+IZQaI14vsWEQ==', 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `utilisateur_libelle`
+--
+CREATE TABLE IF NOT EXISTS `utilisateur_libelle` (
+`idutilisateur` int(11)
+,`nom` varchar(50)
+,`prenom` varchar(50)
+,`login` varchar(50)
+,`passe` varchar(50)
+,`idrole` int(11)
+,`active` int(11)
+,`role` varchar(50)
+);
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `utilisateur_libelle`
+--
+DROP TABLE IF EXISTS `utilisateur_libelle`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `utilisateur_libelle` AS select `utilisateur`.`idutilisateur` AS `idutilisateur`,`utilisateur`.`nom` AS `nom`,`utilisateur`.`prenom` AS `prenom`,`utilisateur`.`login` AS `login`,`utilisateur`.`passe` AS `passe`,`utilisateur`.`idrole` AS `idrole`,`utilisateur`.`active` AS `active`,`role`.`libelle` AS `role` from (`utilisateur` join `role` on((`role`.`idrole` = `utilisateur`.`idrole`)));
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

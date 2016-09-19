@@ -1,70 +1,136 @@
 package action;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
 
+import com.affichage.HTMLBuilder;
 import com.mapping.Utilisateur;
 import com.service.LoginService;
 
-public class LoginAction {
-	private String error="";
-	private String cible="stat";
-	private String id="";
-	private String currmenu="";
-	public String testLogin(){
-		HttpServletRequest request = ServletActionContext.getRequest();
+import dao.DaoModele;
+import utilitaire.SessionUtil;
+import utilitaire.UtilCrypto;
+
+public class LoginAction extends Action {
+	public String testLogin(HttpServletRequest request,HttpServletResponse response){
 		if(request.getParameter("login")==null || request.getParameter("passe")==null)
 		{
-			error="Mot de passe ou login obligatoire";
+			goTo(request, response, "login.jsp?erreur=Mot de passe ou login obligatoire");
 			return "error";
 		}
 		if(request.getParameter("login").isEmpty() || request.getParameter("passe").isEmpty())
 		{
-			error="Mot de passe et login obligatoire";
+			goTo(request, response, "login.jsp?erreur=Mot de passe ou login obligatoire");
 			return "error";
 		}
 		Utilisateur u=null;
 		try {
 			u=LoginService.getInstance().testLogin(request.getParameter("login"), request.getParameter("passe"));
 		} catch (Exception e) {
-			error=e.getMessage();
+			goTo(request, response, "login.jsp?erreur="+e.getMessage());
 			return "error";
 		}
 		if(u==null){
-			error="Login ou mot de passe inconnue";
+			goTo(request, response, "login.jsp?erreur=Login ou mot de passe inconnue");
 			return "error";
 		}
 		request.getSession().setAttribute("utilisateur", u);
-		return "ok";
-	}
-	public String modifRole(){
-		return "ok";
-	}
-	public String getCible() {
-		return cible;
-	}
-	public void setCible(String cible) {
-		if(cible==null || cible.compareToIgnoreCase("null")==0)
+		String cible=(String) request.getParameter("cible");
+		if(cible==null || cible.isEmpty())
 			cible="stat";
-		this.cible = cible;
+		goTo(request, response, "main.jsp?cible="+cible);
+		return "ok";
 	}
-	public String getId() {
-		return id;
+	public void desactive(HttpServletRequest request,HttpServletResponse response){
+		try{
+			int id=Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id"));
+			Utilisateur user=DaoModele.getInstance().findById(new Utilisateur(), id);
+			if(user==null)
+			{
+				goTo(request, response, "main.jsp?cible=configuration/utilisateur-modif");
+				return;
+			}
+			user.setActive(2);
+			DaoModele.getInstance().update(user);
+			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+id);
+		}
+		catch(Exception ex){
+			try {
+				Serveur.back(request,response);
+				ex.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void active(HttpServletRequest request,HttpServletResponse response)
+	{
+		try{
+			int id=Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id"));
+			Utilisateur user=DaoModele.getInstance().findById(new Utilisateur(), id);
+			if(user==null)
+			{
+				goTo(request, response, "main.jsp?cible=configuration/utilisateur-modif");
+				return;
+			}
+			user.setActive(1);
+			DaoModele.getInstance().update(user);
+			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+id);
+		}
+		catch(Exception ex){
+			try {
+				Serveur.back(request,response);
+				ex.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-	public String getError() {
-		return error;
+	public String ajoutUtilisateur(HttpServletRequest request,HttpServletResponse response){
+		try{
+			Utilisateur user=new HTMLBuilder<Utilisateur>(new Utilisateur(), request).getValue();
+			if(!user.isValide()){
+				goTo(request,response,"main.jsp?cible=configuration/utilisateur-ajout&erreur=Champ manquant");
+				return "error";
+			}
+			user.setPasse(UtilCrypto.encrypt(user.getLogin()));
+			user.setActive(2);
+			DaoModele.getInstance().save(user);
+			goTo(request,response,"main.jsp?cible=configuration/liste-utilisateur&"+String.valueOf(user.getIdutilisateur()));
+			return "ok";
+		}
+		catch(Exception ex){
+			return "error";
+		}
 	}
-	public void setError(String error) {
-		this.error = error;
+	public void modif(HttpServletRequest request,HttpServletResponse response){
+		try{
+			Utilisateur user=new HTMLBuilder<Utilisateur>(new Utilisateur(), request).getValue();
+			Utilisateur usernw=DaoModele.getInstance().findById(new Utilisateur(), user.getIdutilisateur());
+			if(!user.isValide())
+			{
+				goTo(request, response, "main.jsp?cible=configuration/utilisateur-modif&erreur=Champ manquant");
+				return;
+			}
+			user.setPasse(usernw.getPasse());
+			DaoModele.getInstance().update(user);
+			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+user.getIdutilisateur());
+		}
+		catch(Exception ex){
+			try {
+				Serveur.back(request,response);
+				ex.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-	public String getCurrmenu() {
-		return currmenu;
-	}
-	public void setCurrmenu(String currmenu) {
-		this.currmenu = currmenu;
-	}
+	
 }

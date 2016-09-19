@@ -1,6 +1,7 @@
 package dao;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -25,6 +26,8 @@ import com.annotations.Parameter;
 
 import com.mapping.DataEntity;
 import com.mapping.ListPaginner;
+import com.mchange.v1.db.sql.ConnectionUtils;
+
 import dao.Connecteur.DatabaseType;
 
 public class DaoModele {
@@ -128,6 +131,31 @@ public class DaoModele {
 			
 		}
     }
+    public <T extends DataEntity> T findById(T entity) throws Exception{
+    	return findById(entity,(int)entity.getPkValue());
+    }
+    public <T extends DataEntity> T findById(T entity,int id) throws Exception{
+    	Connection connex=null;
+    	try{
+    		connex=Connecteur.getConnection(entity.findDataBaseKey());
+    		return findById(entity,id,connex);
+    	}
+    	catch(Exception ex){
+    		throw ex;
+    	}
+    	finally{
+    		if(connex!=null)
+    			connex.close();
+    	}
+    }
+    public <T extends DataEntity> T findById(T entity,int id,Connection conn) throws Exception
+    {
+    	ResultSet rs=conn.createStatement().executeQuery("select * from "+entity.findReference()+" where "+entity.getPkName()+"="+id);
+    	List<T> reps=resoudre(rs, entity);
+    	if(reps.size()>0)
+    		return reps.get(0);
+    	return null;
+    }
     public <T extends DataEntity> List<T> findStat(int page,T objet,Connection connection,String apresWhere)throws Exception
     {
     	Field[]fields=objet.getAllFields();
@@ -199,8 +227,10 @@ public class DaoModele {
     	T inter=null;
     	Field[]interv=objet.getAllFields();
     	ResultSetMetaData meta=rs.getMetaData();
+    	String reference=objet.findReference();
         while(rs.next()){
         	inter=(T) objet.getClass().newInstance();
+        	inter.setNomTable(reference);
         	for(int i=0;i<interv.length;i++){
         		String getting=setMaj(interv[i].getType().getSimpleName());
         		if(isExisteColonne(rs,inter.getReferenceForField(interv[i]))==false){
@@ -250,7 +280,7 @@ public class DaoModele {
     public static String setMaj(String nom){
     	return nom.toUpperCase().substring(0, 1)+""+nom.substring(1);
     }
-    boolean isExisteChamp(String champ,String nomTable,Connection conn) throws Exception{
+    public boolean isExisteChamp(String champ,String nomTable,Connection conn) throws Exception{
     	Statement stat=null;
     	ResultSet rs=null;
     	try{
@@ -396,7 +426,7 @@ public class DaoModele {
 		String reponse="";
 		if(objet!=null){
 			
-			Map<Field,Object>filters=objet.getFieldsFilter();
+			Map<Field,Object>filters=objet.getFieldsFilter(conn);
 			Set<Entry<Field, Object>> fil=filters.entrySet();
 			
 			for(Entry<Field, Object> entry:fil){
@@ -411,7 +441,7 @@ public class DaoModele {
 					reponse+=" "+objet.getReferenceForField(entry.getKey())+"='"+text+"' and ";
 				}
 				else if(entry.getKey().getType().equals(String.class))  
-					reponse+=" "+objet.getReferenceForField(entry.getKey())+" like '"+entry.getValue()+"' and";
+					reponse+=" upper("+objet.getReferenceForField(entry.getKey())+") like '"+String.valueOf(entry.getValue()).toUpperCase()+"' and";
 				else 
 					reponse+=" "+objet.getReferenceForField(entry.getKey())+"="+entry.getValue()+" and";
 			}
@@ -483,34 +513,46 @@ public class DaoModele {
 		}
 	}
 	String [] colModif(DataEntity modele)throws Exception{
-		
-		Field[]attr=modele.getAllFields();
-		String reponse[]=new String[attr.length];
-		int irep=0;
-		
-		boolean isIndex=true;
-		
-		for(int i=0;i<attr.length;i++){
-			if(attr[i].getName().compareToIgnoreCase(modele.getPkName())==0)
-				continue;
-			Object valeur=null;
-			try{
-				valeur=modele.getClass().getMethod("get"+setMaj(attr[i].getName()), null).invoke(modele, null);
-			}
-			catch(NoSuchMethodException ex){
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(modele.findDataBaseKey());
+			Field[]attr=modele.getAllFields();
+			String reponse[]=new String[attr.length];
+			int irep=0;
+			
+			boolean isIndex=true;
+			
+			for(int i=0;i<attr.length;i++){
+				if(attr[i].getName().compareToIgnoreCase(modele.getPkName())==0)
+					continue;
+				if(!isExisteChamp(modele.getReferenceForField(attr[i]), modele.findReference(), conn))
+					continue;
+				Object valeur=null;
 				try{
-					valeur=modele.getClass().getMethod("find"+setMaj(attr[i].getName()), null).invoke(modele, null);
+					valeur=modele.getClass().getMethod("get"+setMaj(attr[i].getName()), null).invoke(modele, null);
 				}
-				catch(Exception e){
+				catch(NoSuchMethodException ex){
+					try{
+						valeur=modele.getClass().getMethod("find"+setMaj(attr[i].getName()), null).invoke(modele, null);
+					}
+					catch(Exception e){
+					}
 				}
+				
+				reponse[irep]=attr[i].getName();
+				irep++;
+				isIndex=false;
+				
 			}
-			
-			reponse[irep]=attr[i].getName();
-			irep++;
-			isIndex=false;
-			
+			return reponse;
 		}
-		return reponse;
+		catch(Exception ex){
+			throw ex;
+		}
+		finally{
+			if(conn!=null)
+				conn.close();
+		}
 	}
 	String getRequetteModif(DataEntity modele,String[]field)throws Exception{
 		String reponse=" update "+modele.findReference()+" set ";

@@ -7,8 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mapping.OptionObject;
+import com.annotations.ForeignKey;
 import com.annotations.Required;
 import com.mapping.DataEntity;
+import com.mapping.ListPaginner;
+
+import dao.DaoModele;
 
 public class Champ {
 	private Field field=null;
@@ -19,7 +24,14 @@ public class Champ {
 	private Class type=null;
 	private Method methodForChamp=null;
 	private DataEntity entity=null;
+	private ForeignKey fk=null;
 	
+	public ForeignKey getFk() {
+		return fk;
+	}
+	public void setFk(ForeignKey fk) {
+		this.fk = fk;
+	}
 	public Field getField() {
 		return field;
 	}
@@ -86,5 +98,33 @@ public class Champ {
 	}
 	public void setMethodForChamp(String methodForChamp) throws NoSuchMethodException, SecurityException {
 		this.methodForChamp = entity.getClass().getMethod(methodForChamp, null);
+	}
+	public boolean isForeignKey(){
+		if(fk!=null)
+			return true;
+		if(field!=null){
+			return (fk=field.getAnnotation(ForeignKey.class))!=null;
+		}
+		return false;
+	}
+	public List<OptionObject> getForeignKeyData()throws Exception
+	{
+		if(fk==null)throw new Exception("Pas de foreign key pour le champ "+nameField);
+		if(fk.toclasse()!=null){
+			List<DataEntity> rep=DaoModele.getInstance().findPageGenerique(1, (DataEntity)fk.toclasse().newInstance());
+			ListPaginner<OptionObject> options=new ListPaginner<OptionObject>();
+			options.nbPage=((ListPaginner<DataEntity>)rep).nbPage;
+			for(DataEntity item:rep)
+			{
+				options.add(new OptionObject(String.valueOf(item.getValueForField(item.getFieldByName(fk.pktable()))), String.valueOf(item.getValueForField(item.getFieldByName(fk.libtable())))));
+			}
+			return options;
+		}
+		OptionObject option=new OptionObject();
+		option.setNomTable(fk.totable());
+		option.setReferenceForField("id", fk.pktable());
+		option.setReferenceForField("val", fk.libtable());
+		option.setPackSize(100);
+		return DaoModele.getInstance().findPageGenerique(1, option);
 	}
 }

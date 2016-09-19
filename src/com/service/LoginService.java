@@ -10,6 +10,7 @@ import com.mapping.Utilisateur;
 
 import dao.Connecteur;
 import dao.DaoModele;
+import utilitaire.UtilCrypto;
 
 public class LoginService {
 	private static LoginService instance=null;
@@ -22,7 +23,7 @@ public class LoginService {
 		return instance;
 	}
 	public boolean isAllowed(Utilisateur utilisateur,String activite)throws Exception{
-		List<RoleActivite> rep=DaoModele.getInstance().findPageGenerique(1, new RoleActivite(), " and idrole="+utilisateur.getIdrole()+" and activite='"+activite+"'");
+		List<RoleActivite> rep=DaoModele.getInstance().findPageGenerique(1, new RoleActivite(), " and idrole="+utilisateur.getIdrole()+" and upper(activite)='"+activite.toUpperCase()+"'");
 		return rep.size()!=0;
 	}
 	public Utilisateur testLogin(String login,String passe)throws Exception{
@@ -31,7 +32,7 @@ public class LoginService {
 			connex=Connecteur.getConnection();
 			connex.setAutoCommit(false);
 			Utilisateur ob=new Utilisateur();
-			List<Utilisateur> rep=DaoModele.getInstance().findPageGenerique(1, ob,connex," and login='"+login.replace("'", "")+"' and passe='"+passe.replace("'", "")+"' and active=1");
+			List<Utilisateur> rep=DaoModele.getInstance().findPageGenerique(1, ob,connex," and login='"+login.replace("'", "")+"' and passe='"+UtilCrypto.encrypt(passe)+"' and active=1");
 			if(rep.size()>0)
 			{
 				NotificationService.getInstance().saveNotification(Notification.LOGIN, rep.get(0).getIdutilisateur(), connex, rep.get(0));

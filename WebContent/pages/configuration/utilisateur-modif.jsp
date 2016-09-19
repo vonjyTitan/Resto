@@ -7,11 +7,13 @@
 
 <jsp:include page='../verificateur.jsp'/>
 
-<% InsertUpdateBuilder builder=new InsertUpdateBuilder(new Utilisateur(),"modifUser",request); 
+<% InsertUpdateBuilder builder=new InsertUpdateBuilder(new Utilisateur(),"Action?to=login-modif",request); 
 	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
-	builder.setTitle("Modification du role d'un utilisateur");
-	builder.removeChamp(new String[]{"passe","nom","prenom","login","active"});
-	builder.setChampSelect("idrole",new Role(),new String[]{"idrole","libelle"});
-	builder.addNotVisibleChamp("idutilisateur");
-	out.print(builder.getHTML(5));
-%>
+	builder.removeChamp("passe");
+	builder.addNotVisibleChamp("idutilisateur");%>
+	<h3><a href="main.jsp?cible=configuration/liste-utilisateur"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Modification utilisateur</h3>
+	<%
+	out.print(builder.getHTML(5)); 
+	%>
+
+
