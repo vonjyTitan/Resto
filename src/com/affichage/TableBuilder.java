@@ -28,6 +28,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	private Map<Champ,String> lienForChamp=null;
 	private Map<Champ,Champ> idchampForchamp=null;
 	private FilterBuilder filterBuilder=null;
+	private boolean isWithFilter=false;
 	
 	public TableBuilder(T entity,HttpServletRequest request) throws Exception{
 		super(entity,request);
@@ -53,7 +54,8 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		if(withcheckbox){
 			reponse+="<th></th>";
 		}
-		reponse+="<th>"+getFieldByName(entity.getPkName()).getLibelle()+"</th>";
+		Champ pk=getFieldByName(entity.getPkName());
+		reponse+="<th>"+getSigne(pk.getField())+" <a href=\""+getSimpleLien()+"&nomChampOrder="+pk.getName()+"&ordering="+getOrderForField(pk.getField())+"\">"+pk.getLibelle()+"</a></th>";
 		for(Champ f:fieldsAvalaible){
 			if(f.getName().compareToIgnoreCase(entity.getPkName())==0 || isNotVisible(f))
 				continue;
@@ -86,7 +88,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 				else if(f.getField().getType().equals(Double.class) || f.getField().getType().equals(double.class) || f.getField().getType().equals(Float.class) || f.getField().getType().equals(float.class)){
 					value=UtileAffichage.formatMoney((double) value);
 				}
-				if(DataEntity.isNumberType(value.getClass()))
+				if(value !=null && DataEntity.isNumberType(value.getClass()))
 					reponse+="<td>"+getLienForField(f.getField(), value)+"</td>";
 				else
 					reponse+="<td style=\"text-align:left;\">"+getLienForField(f.getField(), value)+"</td>";
@@ -130,6 +132,14 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		actualPage=Integer.valueOf("0"+((request.getParameter("page")!=null) ? request.getParameter("page") : "1"));
 		if(actualPage<1){
 			actualPage=1;			
+		}
+		if(!isWithFilter)
+		{
+			String lastCh=entity.findNomChampOrder();
+			String lastOrd=entity.findOrdering();
+			setEntity((T) entity.getClass().newInstance());
+			entity.setNomChampOrder(lastCh);
+			entity.setOrdering(lastOrd);
 		}
 		data=DaoModele.getInstance().findPageGenerique(actualPage, entity,apresWhere);
 	}
@@ -252,5 +262,11 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 	}
 	public void setLienForModif(String lienForModif) {
 		entity.setLienForModif(lienForModif);
+	}
+	public boolean isWithFilter() {
+		return isWithFilter;
+	}
+	public void setWithFilter(boolean isWithFilter) {
+		this.isWithFilter = isWithFilter;
 	}
 }

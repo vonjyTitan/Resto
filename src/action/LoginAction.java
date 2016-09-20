@@ -48,52 +48,40 @@ public class LoginAction extends Action {
 		goTo(request, response, "main.jsp?cible="+cible);
 		return "ok";
 	}
-	public void desactive(HttpServletRequest request,HttpServletResponse response){
+	public void desactive(HttpServletRequest request,HttpServletResponse response) throws Exception{
 		try{
 			int id=Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id"));
 			Utilisateur user=DaoModele.getInstance().findById(new Utilisateur(), id);
 			if(user==null)
 			{
-				goTo(request, response, "main.jsp?cible=configuration/utilisateur-modif");
-				return;
+				throw new Exception("Utilisateur introuvable");
 			}
 			user.setActive(2);
 			DaoModele.getInstance().update(user);
 			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+id);
 		}
 		catch(Exception ex){
-			try {
-				Serveur.back(request,response);
-				ex.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			throw ex;
 		}
 	}
-	public void active(HttpServletRequest request,HttpServletResponse response)
+	public void active(HttpServletRequest request,HttpServletResponse response) throws Exception
 	{
 		try{
 			int id=Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id"));
 			Utilisateur user=DaoModele.getInstance().findById(new Utilisateur(), id);
 			if(user==null)
 			{
-				goTo(request, response, "main.jsp?cible=configuration/utilisateur-modif");
-				return;
+				throw new Exception("Utilisateur introuvable");
 			}
 			user.setActive(1);
 			DaoModele.getInstance().update(user);
 			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+id);
 		}
 		catch(Exception ex){
-			try {
-				Serveur.back(request,response);
-				ex.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			throw ex;
 		}
 	}
-	public String ajoutUtilisateur(HttpServletRequest request,HttpServletResponse response){
+	public String ajoutUtilisateur(HttpServletRequest request,HttpServletResponse response) throws Exception{
 		try{
 			Utilisateur user=new HTMLBuilder<Utilisateur>(new Utilisateur(), request).getValue();
 			if(!user.isValide()){
@@ -107,10 +95,10 @@ public class LoginAction extends Action {
 			return "ok";
 		}
 		catch(Exception ex){
-			return "error";
+			throw ex;
 		}
 	}
-	public void modif(HttpServletRequest request,HttpServletResponse response){
+	public void modif(HttpServletRequest request,HttpServletResponse response) throws Exception{
 		try{
 			Utilisateur user=new HTMLBuilder<Utilisateur>(new Utilisateur(), request).getValue();
 			Utilisateur usernw=DaoModele.getInstance().findById(new Utilisateur(), user.getIdutilisateur());
@@ -124,12 +112,7 @@ public class LoginAction extends Action {
 			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+user.getIdutilisateur());
 		}
 		catch(Exception ex){
-			try {
-				Serveur.back(request,response);
-				ex.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			throw ex;
 		}
 	}
 	

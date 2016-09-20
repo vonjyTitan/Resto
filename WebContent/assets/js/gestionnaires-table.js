@@ -6,8 +6,10 @@ var addmode=false;
 var selectmode=false;
 var mousePress=false;
 var selectedTable=undefined;
+var onMouseUp=undefined;
 
 var inputStates = {};
+var colorEtat=["#5cb85c","#428bca","#f0ad4e","#f0ad4e"];
 
 // array of tables to animate
 var tableArray = [];
@@ -15,12 +17,13 @@ var tableArray = [];
 function initGestionTable(idDiv,tableListe,
 addmodeVal,
 selectmodeVal,
-moovemodeVal) 
+moovemodeVal,onMouseUpVal) 
 {
 	addmode=addmodeVal;
 	selectmode=selectmodeVal;
 	moovemode=moovemodeVal;
 	tableArray=tableListe;
+	onMouseUp=onMouseUpVal;
 	
 	var canvas = document.createElement('canvas');
         div = $("#"+idDiv); 
@@ -56,12 +59,18 @@ moovemodeVal)
 		}
 }, false); 
    canvas.addEventListener('mouseleave', function(event){
+	   if(onMouseUp!=undefined && selectedTable!=null)
+	   {
+		   onMouseUp(selectedTable,x,y);
+	   }
+	   
 	   selectedTable=null;
    });
  canvas.addEventListener('mouseup', function(event){ 
  mousePress=false;
- if(selectedTable!=undefined && moovemode){
-	
+ if(onMouseUp!=undefined && selectedTable!=null)
+ {
+	   onMouseUp(selectedTable,x,y);
  }
  selectedTable=undefined;
  }, false);
@@ -102,19 +111,20 @@ function mainLoop() {
     // for each table in the array
     for(var i=0; i < tableArray.length; i++) {
       var table = tableArray[i];
-     // table.move(x,y);
       table.draw();
   }
     // ask for a new frame of animation at 60f/s
      window.requestAnimationFrame(mainLoop);
 }
 
-function Table(x, y, diameter,nom,id) {
+function Table(x, y, diameter,nom,id,drawable,etat) {
   this.x = x;
   this.y = y;
   this.radius = diameter/2;
   this.nom=nom;
   this.id=id;
+  this.drawable=drawable;
+  this.etat=etat;
   
   this.isClicked=function(valx,valy){
       var dx = (this.x)-valx;
@@ -131,11 +141,12 @@ function Table(x, y, diameter,nom,id) {
 	  ctx.font="20px Georgia";
 	  ctx.fillStyle = "white";
 	  ctx.fillText(nom,this.x-16,this.y+5);
-	  //ctx.fill();
+	  ctx.fillStyle = colorEtat[this.etat];
+	  //arc vide ajout
   };
   
   this.move = function(mx,my) {
-	
+	if(!this.drawable)return;
 	this.x = mx;
     this.y = my;
    

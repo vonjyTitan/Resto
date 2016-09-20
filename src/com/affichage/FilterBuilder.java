@@ -28,6 +28,7 @@ public class FilterBuilder<T extends DataEntity> extends FormBuilder<T> {
 	}
 	
 	public String getHTML() throws Exception{
+		tableau.setWithFilter(true);
 		String reponse=beginHTMLForm();
 		reponse+=HTMLBuilder.beginPanel("Filtre",12);
 		reponse+=getHTMLBody();

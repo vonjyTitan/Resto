@@ -17,13 +17,13 @@ public class Action {
 		} catch (Exception e) 
 		{
 			e.printStackTrace();
-			Serveur.back(request, response);
+			Serveur.back(request, response,e.getMessage());
 			return;
 		} 
 	}
-	protected void back(HttpServletRequest request,HttpServletResponse response){
+	protected void back(HttpServletRequest request,HttpServletResponse response,String error){
 		try {
-			Serveur.back(request, response);
+			Serveur.back(request, response,error);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

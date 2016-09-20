@@ -16,7 +16,7 @@
 <h3><a href="main.jsp?cible=configuration/liste-utilisateur"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Detail utilisateur</h3>
 <%=builder.beginPanel("Informations general", 6) %>
 <%=builder.getBody()%>
-<div class="form-group col-lg-12">
+<div class="form-group col-lg-12" style="text-align: right;">
 <%if(((Utilisateur)builder.getEntity()).getActive()==2){ %>
 	<a class="btn btn-success btn-xs" href="Action?to=login-active&id=<%=((Utilisateur)builder.getEntity()).getIdutilisateur()%>"><i class="fa fa-check"></i>Activer</a>
 		<%

@@ -20,7 +20,7 @@ public class SessionUtil {
 	}
 	public static String getValForAttr(HttpServletRequest request,String attr){
 		String reponse=request.getParameter(attr);
-		if(reponse==null || reponse.compareToIgnoreCase("null")==0)
+		if(reponse==null)
 		{
 			return (String) request.getAttribute(attr);
 		}

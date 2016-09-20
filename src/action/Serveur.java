@@ -89,21 +89,21 @@ public class Serveur extends HttpServlet {
 				if(!LoginService.getInstance().isAllowed((Utilisateur) request.getSession().getAttribute("utilisateur"),request.getParameter("to")))
 					throw new Exception("Vous n'avez pas acces a cette page!");
 			} catch (Exception e) {
-				back(request,response);
+				back(request,response,e.getMessage());
 				return;
 			}
 		}
 		String cible=new String(request.getParameter("to"));
 		if(cible==null || cible.isEmpty() || cible.split("-").length<=1)
 		{
-			back(request,response);
+			back(request,response,"Action introuvable");
 			return;
 		}
 		String classe=cible.split("-")[0]+"Action";
 		String method=cible.split("-")[1];
 		if(!allAction.containsKey(classe.toLowerCase()))
 		{
-			back(request,response);
+			back(request,response,"Class d'action introuvable");
 			return;
 		}
 		Action action=allAction.get(classe.toLowerCase());
@@ -111,12 +111,12 @@ public class Serveur extends HttpServlet {
 			action.run(method, request, response, this);
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			back(request,response);
+			back(request,response,ex.getMessage());
 		}
 		
 	}
-	public static void back(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		response.getWriter().write("<html><body><script>history.back();</script></body></html>");
+	public static void back(HttpServletRequest request, HttpServletResponse response,String errer) throws IOException{
+		response.getWriter().write("<html><body><script>alert('"+errer+"');history.back();</script></body></html>");
 	}
 
 }

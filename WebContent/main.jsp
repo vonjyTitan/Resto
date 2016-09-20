@@ -19,6 +19,7 @@ try{
   catch(Exception ex)
   {
 	  %><script language="JavaScript">
+	  alert("Vous n'avez pas acces a cette page!");
          history.back();</script><%
   		return ;
   }
@@ -262,7 +263,7 @@ try{
                           <span>Table</span>
                       </a>
                       <ul class="sub">
-                          <li><a  href="calendar.html">Liste des tables</a></li>
+                          <li><a  href="main.jsp?cible=configuration/table-gestion&currmenu=menu-liste-table" id="menu-liste-table">Liste des tables</a></li>
                           <li><a  href="gallery.html">Ajout de table</a></li>
                       </ul>
                   </li>

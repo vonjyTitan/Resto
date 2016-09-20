@@ -453,7 +453,7 @@ public class DaoModele {
 	String getNomTable(DataEntity objet,Connection conn,String apresWhere)throws Exception{
 		return objet.findReference()+" WHERE "+getCondition(objet,conn,apresWhere);
 	}
-	public void update(List<DataEntity> liste,Connection conn,String apresWhere)throws Exception{
+	public <T extends DataEntity> void update(List<T> liste,Connection conn,String apresWhere)throws Exception{
 		String[]col=colModif(liste.get(0));
 		String query=getRequetteModif(liste.get(0),col);
 		if(apresWhere!=null)
@@ -491,7 +491,7 @@ public class DaoModele {
 			prstat.executeUpdate();
 		}
 	}
-	public void update(List<DataEntity> liste)throws Exception{
+	public <T extends DataEntity> void update(List<T> liste)throws Exception{
 		Connection conn = null;
 		try{
 			conn=Connecteur.getConnection(liste.get(0).findDataBaseKey());
@@ -589,7 +589,7 @@ public class DaoModele {
 			}
 	}
 	
-	public void update(DataEntity objet,String apresWhere)throws Exception {
+	public <T extends DataEntity> void update(T objet,String apresWhere)throws Exception {
 		Connection conn=null;
 		try{
 			conn=Connecteur.getConnection(objet.findDataBaseKey());
@@ -605,20 +605,20 @@ public class DaoModele {
 		}
 		
 	}
-	public void update(DataEntity objet)throws Exception {
+	public <T extends DataEntity> void update(T objet)throws Exception {
 			update(objet,"");
 	}
-	public void update(DataEntity objet,Connection conn,String apresWhere)throws Exception {
+	public <T extends DataEntity> void update(T objet,Connection conn,String apresWhere)throws Exception {
 		List<DataEntity> liste=new ArrayList<DataEntity>();
 		liste.add(objet);
 		update(liste,conn,apresWhere);
 	}
-	public void update(DataEntity objet,Connection conn)throws Exception {
+	public <T extends DataEntity> void update(T objet,Connection conn)throws Exception {
 		List<DataEntity> liste=new ArrayList<DataEntity>();
 		liste.add(objet);
 		update(liste,conn,"");
 	}
-	public void delete(DataEntity objet)throws Exception{
+	public <T extends DataEntity> void delete(T objet)throws Exception{
 		Connection connexion=null;
 		try{
 			connexion=Connecteur.getConnection(objet.findDataBaseKey());
@@ -632,7 +632,7 @@ public class DaoModele {
 				connexion.close();
 		}
 	}
-	public void delete(DataEntity objet,Connection connexion)throws Exception{
+	public <T extends DataEntity> void delete(T objet,Connection connexion)throws Exception{
 		try{
 			List<DataEntity> inter=new ArrayList<DataEntity>();
 			inter.add(objet);
