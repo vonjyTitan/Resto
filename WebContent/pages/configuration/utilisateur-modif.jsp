@@ -7,7 +7,7 @@
 
 <jsp:include page='../verificateur.jsp'/>
 
-<% InsertUpdateBuilder builder=new InsertUpdateBuilder(new Utilisateur(),"Action?to=login-modif",request); 
+<% InsertUpdateBuilder builder=new InsertUpdateBuilder(new Utilisateur(),"login-modif",request); 
 	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
 	builder.removeChamp("passe");
 	builder.addNotVisibleChamp("idutilisateur");%>

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Mar 20 Septembre 2016 à 05:33
+-- Généré le: Mar 20 Septembre 2016 à 20:14
 -- Version du serveur: 5.5.24-log
 -- Version de PHP: 5.3.13
 
@@ -76,7 +76,11 @@ INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'configuration/table-modif'),
 (2, 'configuration/table-modif'),
 (1, 'table-modif'),
-(2, 'table-modif');
+(2, 'table-modif'),
+(1, 'configuration/table-ajout'),
+(2, 'configuration/table-ajout'),
+(1, 'table-ajout'),
+(2, 'table-ajout');
 
 -- --------------------------------------------------------
 
@@ -100,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `table_liste` (
 
 INSERT INTO `table_liste` (`idtable`, `nom`, `positionx`, `positiony`, `etat`, `place`) VALUES
 (1, 'T1', 309, 46, 1, 4),
-(2, 'T2', 133, 60, 2, 4),
+(2, 'T2', 50, 27, 2, 4),
 (3, 'T3', 46, 132, 3, 6),
 (4, 'T4', 269, 141, 4, 4);
 

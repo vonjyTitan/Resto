@@ -1,4 +1,4 @@
-package action;
+package com.rooteur;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,14 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import com.mapping.Utilisateur;
 import com.service.LoginService;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 import utilitaire.ConfigUtil;
 import utilitaire.SessionUtil;
 
-/**
- * Servlet implementation class Action
- */
-@WebServlet("/Action")
-public class Serveur extends HttpServlet {
+public class Serveur {
 	private static final long serialVersionUID = 1L;
        
     private static Map<String,Action> allAction=new HashMap<String,Action>();
@@ -34,10 +32,10 @@ public class Serveur extends HttpServlet {
     private static void initAction() throws Exception{
     	if(allAction.size()==0)
     	{
-    		ResourceBundle bundle=ConfigUtil.getBundleByName("domaine.properties.action");
-    		String[] classStr=bundle.getString("action").split(";");
-    		if(classStr!=null){
-    			for(String s:classStr)
+    		ScanResult scanResult = new FastClasspathScanner("com.action").scan();
+    		List<String> ss=scanResult.getNamesOfAllClasses();
+    		if(ss!=null){
+    			for(String s:ss)
     			{
     				try {
 						Class classe=Class.forName(s);
@@ -63,21 +61,13 @@ public class Serveur extends HttpServlet {
     	}
     }
 	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		run(request,response);		
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		run(request,response);
-		
-	}
-	protected void run(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public static void run(HttpServletRequest request, HttpServletResponse response,String action) throws ServletException, IOException {
 		try {
 			initAction();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(new String(request.getParameter("to")).compareToIgnoreCase("login-testLogin")!=0)
+		if(action.compareToIgnoreCase("login-testLogin")!=0)
 		{
 			try {
 				SessionUtil.isExisteSession(request);
@@ -86,14 +76,14 @@ public class Serveur extends HttpServlet {
 					return;
 			}
 			try {
-				if(!LoginService.getInstance().isAllowed((Utilisateur) request.getSession().getAttribute("utilisateur"),request.getParameter("to")))
+				if(!LoginService.getInstance().isAllowed((Utilisateur) request.getSession().getAttribute("utilisateur"),action))
 					throw new Exception("Vous n'avez pas acces a cette page!");
 			} catch (Exception e) {
 				back(request,response,e.getMessage());
 				return;
 			}
 		}
-		String cible=new String(request.getParameter("to"));
+		String cible=action;
 		if(cible==null || cible.isEmpty() || cible.split("-").length<=1)
 		{
 			back(request,response,"Action introuvable");
@@ -106,9 +96,9 @@ public class Serveur extends HttpServlet {
 			back(request,response,"Class d'action introuvable");
 			return;
 		}
-		Action action=allAction.get(classe.toLowerCase());
+		Action act=allAction.get(classe.toLowerCase());
 		try {
-			action.run(method, request, response, this);
+			act.run(method, request, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			back(request,response,ex.getMessage());

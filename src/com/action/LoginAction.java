@@ -1,4 +1,4 @@
-package action;
+package com.action;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -12,6 +12,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.affichage.HTMLBuilder;
 import com.mapping.Utilisateur;
+import com.rooteur.Action;
 import com.service.LoginService;
 
 import dao.DaoModele;

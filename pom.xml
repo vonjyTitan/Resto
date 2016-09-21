@@ -170,6 +170,10 @@
 	<artifactId>commons-net</artifactId>
 	<version>3.3</version>
 </dependency>
-
+<dependency>
+    <groupId>io.github.lukehutch</groupId>
+    <artifactId>fast-classpath-scanner</artifactId>
+    <version>LATEST</version>
+</dependency>
   </dependencies>
 </project>

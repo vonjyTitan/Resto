@@ -35,7 +35,7 @@
 	  <div id="login-page">
 	  	<div class="container">
 	  	
-		      <form class="form-login" action="Action?to=login-testLogin" method="POST">
+		      <form class="form-login" action="login-testLogin" method="POST">
 		        <h2 class="form-login-heading">Authentification</h2>
 		        <div class="login-wrap">
 		            <input type="text" name="login" class="form-control" placeholder="Utilisateur" autofocus>

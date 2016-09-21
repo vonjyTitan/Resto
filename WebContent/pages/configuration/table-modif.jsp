@@ -7,7 +7,7 @@
 
 <jsp:include page='../verificateur.jsp'/>
 
-<% InsertUpdateBuilder builder=new InsertUpdateBuilder(new Table(),"Action?to=table-modif",request); 
+<% InsertUpdateBuilder builder=new InsertUpdateBuilder(new Table(),"table-modif",request); 
 	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
 	builder.addNotVisibleChamp(new String[]{"idtable","positionx","positiony","etat"});%>
 	<h3><a href="main.jsp?cible=configuration/table-gestion"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Modification d'une table</h3>

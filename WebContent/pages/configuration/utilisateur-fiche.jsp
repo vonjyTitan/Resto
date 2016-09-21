@@ -18,12 +18,12 @@
 <%=builder.getBody()%>
 <div class="form-group col-lg-12" style="text-align: right;">
 <%if(((Utilisateur)builder.getEntity()).getActive()==2){ %>
-	<a class="btn btn-success btn-xs" href="Action?to=login-active&id=<%=((Utilisateur)builder.getEntity()).getIdutilisateur()%>"><i class="fa fa-check"></i>Activer</a>
+	<a class="btn btn-success btn-xs" href="login-active?id=<%=((Utilisateur)builder.getEntity()).getIdutilisateur()%>"><i class="fa fa-check"></i>Activer</a>
 		<%
 		}
 		else 
 		{
-		%><a class="btn btn-danger btn-xs" href="Action?to=login-desactive&id=<%=((Utilisateur)builder.getEntity()).getIdutilisateur()%>"><i class="fa fa-trash-o "></i> Desactiver</a>
+		%><a class="btn btn-danger btn-xs" href="login-desactive?id=<%=((Utilisateur)builder.getEntity()).getIdutilisateur()%>"><i class="fa fa-trash-o "></i> Desactiver</a>
 		<%} %>
 		<a class="btn btn-primary btn-xs" href="main.jsp?cible=configuration/utilisateur-modif&id=<%=((Utilisateur)builder.getEntity()).getIdutilisateur()%>"><i class="fa fa-pencil "></i> Modifier</a>
 </div>

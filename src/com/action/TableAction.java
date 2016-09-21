@@ -1,4 +1,4 @@
-package action;
+package com.action;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.affichage.HTMLBuilder;
 import com.mapping.Table;
+import com.rooteur.Action;
 
 import dao.Connecteur;
 import dao.DaoModele;

@@ -1,20 +1,30 @@
-package action;
+package com.rooteur;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.el.MethodNotFoundException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mapping.Notification;
+
 public class Action {
-	public void run(String nomMethod,HttpServletRequest request,HttpServletResponse response,HttpServlet servlet) throws IOException{
+	public void run(String nomMethod,HttpServletRequest request,HttpServletResponse response) throws IOException{
 		try {
+			if(nomMethod.isEmpty())
+				throw new Exception("Action introuvable");
 			Method met=this.getClass().getMethod(nomMethod, new Class[]{HttpServletRequest.class,HttpServletResponse.class});
 			met.invoke(this, new Object[]{request,response});
-		} catch (Exception e) 
+		}
+		catch(MethodNotFoundException ex){
+			Serveur.back(request, response,"Action introuvable");
+			return;
+		}
+		catch (Exception e) 
 		{
 			e.printStackTrace();
 			Serveur.back(request, response,e.getMessage());

@@ -2,10 +2,14 @@ package com.mapping;
 
 import com.annotations.Entity;
 import com.annotations.Parameter;
+import com.annotations.Required;
+import com.annotations.StringRestrict;
 
 @Entity(pkName="idtable",reference="table_liste")
 public class Table extends DataEntity {
 	private int idtable;
+	@Required
+	@StringRestrict(minLength=2)
 	private String nom;
 	private int positionx;
 	private int positiony;
@@ -57,12 +61,12 @@ public class Table extends DataEntity {
 	public String getOption(){
 		String reponse=" <a class=\"btn btn-primary btn-xs\" href=\"main.jsp?cible=configuration/table-modif&id="+idtable+"\"><i class=\"fa fa-pencil\"></i></a> ";
 		if(etat==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE){
-			reponse+="<a class=\"btn btn-success btn-xs\" href=\"Action?to=table-liberer\" style=\"width: 70px;\">Liberer</a>";
+			reponse+="<a class=\"btn btn-success btn-xs\" href=\"table-liberer\" style=\"width: 70px;\">Liberer</a>";
 		}
 		else if(etat==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
-			reponse+="<a class=\"btn btn-warning btn-xs\" href=\"Action?to=table-transfert\" style=\"width: 70px;\">Transferer</a>";
+			reponse+="<a class=\"btn btn-warning btn-xs\" href=\"table-transfert\" style=\"width: 70px;\">Transferer</a>";
 		else if(etat==ConstantEtat.ETAT_LIBRE)
-			reponse+="<a class=\"btn btn-primary btn-xs\" href=\"Action?to=table-occuper\" style=\"width: 70px;\">Occuper</a>";
+			reponse+="<a class=\"btn btn-primary btn-xs\" href=\"table-occuper\" style=\"width: 70px;\">Occuper</a>";
 		else if(etat==ConstantEtat.ETAT_RESERVER)
 			return reponse;
 		return reponse;

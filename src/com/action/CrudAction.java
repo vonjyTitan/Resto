@@ -1,10 +1,11 @@
-package action;
+package com.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.affichage.HTMLBuilder;
 import com.mapping.DataEntity;
+import com.rooteur.Action;
 
 import dao.DaoModele;
 import utilitaire.SessionUtil;

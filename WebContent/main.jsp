@@ -264,7 +264,7 @@ try{
                       </a>
                       <ul class="sub">
                           <li><a  href="main.jsp?cible=configuration/table-gestion&currmenu=menu-liste-table" id="menu-liste-table">Liste des tables</a></li>
-                          <li><a  href="gallery.html">Ajout de table</a></li>
+                          <li><a  href="main.jsp?cible=configuration/table-ajout&currmenu=menu-ajout-table" id="menu-ajout-table">Ajout table</a></li>
                       </ul>
                   </li>
                   <li class="sub-menu">

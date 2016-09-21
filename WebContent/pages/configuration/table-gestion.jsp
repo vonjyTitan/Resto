@@ -28,7 +28,7 @@
 <div class="cl-lg-12" id="tableEmpl">
 </div>
 <div class="cl-lg-12">
-	<form action="Action?to=table-modifplace" method="POST">
+	<form action="table-modifplace" method="POST">
 		<%for(Table table:data){
 			%>
 			<input type="hidden" name="id" value="<%=table.getIdtable()%>"/>

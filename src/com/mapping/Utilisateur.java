@@ -78,9 +78,9 @@ public class Utilisateur extends DataEntity {
 	public String getOption() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		String reponse=super.getOption();
 		if(active==2){
-			reponse+= "<a class=\"btn btn-success btn-xs\" href=\"Action?to=login-active&id="+getIdutilisateur()+"\"><i class=\"fa fa-check\"></i></a>";
+			reponse+= "<a class=\"btn btn-success btn-xs\" href=\"login-active?id="+getIdutilisateur()+"\"><i class=\"fa fa-check\"></i></a>";
 		}
-		else reponse+="<a class=\"btn btn-danger btn-xs\" href=\"Action?to=login-desactive&id="+getIdutilisateur()+"\"><i class=\"fa fa-trash-o \"></i></a>";
+		else reponse+="<a class=\"btn btn-danger btn-xs\" href=\"login-desactive?id="+getIdutilisateur()+"\"><i class=\"fa fa-trash-o \"></i></a>";
 		return reponse;
 	}
 	public String getRole() {
