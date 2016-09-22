@@ -321,10 +321,6 @@ public class DaoModele {
 			int indiceStat=1;
 			Field[] champs=data.get(0).getAllFields();
 			for(int ii=0;ii<data.size();ii++){
-				if(!data.get(ii).isValide())
-				{
-					throw new Exception("erreur");
-				}
 				for(int i=0; i<champs.length;i++)
 				{
 					if(isExisteChamp(data.get(0).getReferenceForField(champs[i]),data.get(0).findReference(),con)==false)continue;
@@ -463,10 +459,6 @@ public class DaoModele {
 		boolean isValable=false;
 		int comptset=1;
 		for(int ii=0;ii<liste.size();ii++){
-			if(!liste.get(ii).isValide())
-			{
-				throw new Exception("erreur");
-			}
 			for(String s:col){
 				if(s!=null){
 					Object valeur=null;
