@@ -7,5 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 public @interface NumberRestrict {
 	double min() default 0.0;
 	double max() default 0.0;
+	boolean zeroInclue() default false;
 	String messageOnNoInvalide() default "";
 }

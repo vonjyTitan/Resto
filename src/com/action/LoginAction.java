@@ -59,7 +59,7 @@ public class LoginAction extends Action {
 			}
 			user.setActive(2);
 			DaoModele.getInstance().update(user);
-			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+id);
+			goTo(request, response, "get","main.jsp?cible=configuration/utilisateur-fiche&id="+id);
 		}
 		catch(Exception ex){
 			throw ex;
@@ -76,7 +76,7 @@ public class LoginAction extends Action {
 			}
 			user.setActive(1);
 			DaoModele.getInstance().update(user);
-			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+id);
+			goTo(request, response, "get","main.jsp?cible=configuration/utilisateur-fiche&id="+id);
 		}
 		catch(Exception ex){
 			throw ex;
@@ -92,7 +92,7 @@ public class LoginAction extends Action {
 			user.setPasse(UtilCrypto.encrypt(user.getLogin()));
 			user.setActive(2);
 			DaoModele.getInstance().save(user);
-			goTo(request,response,"main.jsp?cible=configuration/liste-utilisateur&"+String.valueOf(user.getIdutilisateur()));
+			goTo(request,response,"get","main.jsp?cible=configuration/liste-utilisateur&"+String.valueOf(user.getIdutilisateur()));
 			return "ok";
 		}
 		catch(Exception ex){
@@ -110,7 +110,7 @@ public class LoginAction extends Action {
 			}
 			user.setPasse(usernw.getPasse());
 			DaoModele.getInstance().update(user);
-			goTo(request, response, "main.jsp?cible=configuration/utilisateur-fiche&id="+user.getIdutilisateur());
+			goTo(request, response,"get", "main.jsp?cible=configuration/utilisateur-fiche&id="+user.getIdutilisateur());
 		}
 		catch(Exception ex){
 			throw ex;

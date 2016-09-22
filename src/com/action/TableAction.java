@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.affichage.HTMLBuilder;
+import com.mapping.ConstantEtat;
 import com.mapping.Table;
 import com.rooteur.Action;
 
@@ -40,7 +41,7 @@ public class TableAction extends Action {
 			}
 			DaoModele.getInstance().update(tables,conn,"");
 			conn.commit();
-			goTo(request,response,"main.jsp?cible=configuration/table-gestion");
+			goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 			return;
 		}
 		catch(Exception ex){
@@ -71,11 +72,23 @@ public class TableAction extends Action {
 			
 			DaoModele.getInstance().update(table);
 			
-			goTo(request,response,"main.jsp?cible=configuration/table-gestion");
+			goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 			return;
 		}
 		catch(Exception ex){
 			throw ex;
 		}
+	}
+	public void ajout(HttpServletRequest request,HttpServletResponse response) throws Exception
+	{
+		Table table = new HTMLBuilder<Table>(new Table(),request).getEntity();
+		if(!table.isValide())
+		{
+			goTo(request,response,"main.jsp?cible=configuration/table-ajout&erreur=Champ invalide");
+			return;
+		}
+		table.setEtat(ConstantEtat.ETAT_LIBRE);
+		DaoModele.getInstance().save(table);
+		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 	}
 }

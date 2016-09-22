@@ -19,12 +19,14 @@ import javax.swing.text.DateFormatter;
 
 import com.annotations.Entity;
 import com.annotations.Extension;
+import com.annotations.ForeignKey;
 import com.annotations.NumberRestrict;
 import com.annotations.Parameter;
 import com.annotations.Required;
 import com.annotations.StringRestrict;
 
 import dao.DaoModele;
+import utilitaire.UtileAffichage;
 
 import com.annotations.DateRestrict;
 
@@ -202,6 +204,12 @@ public abstract class DataEntity {
 					else if((annotation=f.getAnnotation(NumberRestrict.class))!=null){
 						valideChampNumber(f, (NumberRestrict) annotation, value);
 					}
+					ForeignKey fk=null;
+					if((fk=f.getAnnotation(ForeignKey.class))!=null && isNumberType(f.getType())){
+						if((int)value==0 && fk.nullable())
+							continue;
+						valideChampFK(f,fk,value);
+					}
 				}
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
@@ -212,6 +220,37 @@ public abstract class DataEntity {
 			}
 		}
 		return formError.size()==0;
+	}
+	private void valideChampFK(Field f,ForeignKey fk,Object value){
+		if(fk.toclasse()!=null){
+			try{
+				DataEntity entity=(DataEntity) fk.toclasse().newInstance();
+				if(fk.totable()!=null && !fk.totable().isEmpty())
+					entity.setNomTable(fk.totable());
+				entity=DaoModele.getInstance().findById(entity, (int)entity.getPkValue());
+				if(entity==null){
+					formError.put(f, (fk.messageOnNotExiste()!=null && !fk.messageOnNotExiste().isEmpty())
+							? fk.messageOnNotExiste() : "La valeur du champ "+this.getReferenceForField(f)+" doit etre dans "+entity.findReference());
+				}
+				return;
+			}
+			catch(Exception ex){
+				ex.printStackTrace();
+				return;
+			}
+		}
+		try{
+			OptionObject option=new OptionObject();
+			option.setNomTable(fk.totable());
+			List<OptionObject> ress=DaoModele.getInstance().findPageGenerique(1, option," and "+fk.pktable()+"="+value);
+			if(ress.size()==0){
+				formError.put(f, (fk.messageOnNotExiste()!=null && !fk.messageOnNotExiste().isEmpty())
+						? fk.messageOnNotExiste() : "La valeur du champ "+this.getReferenceForField(f)+" doit etre dans "+fk.totable());
+			}
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+		}
 	}
 	private void valideChampString(Field f,StringRestrict restriction,Object value){
 		if(!(value instanceof String))
@@ -236,9 +275,32 @@ public abstract class DataEntity {
 		if(!isNumberType(f.getType()))
 			return;
 		double val=Double.valueOf(String.valueOf(value));
-		if((val<restriction.min() || val>restriction.max() && val!=0)){
-			formError.put(f,restriction.messageOnNoInvalide().length()!=0 ? restriction.messageOnNoInvalide()
-					: "La valeur du champ "+getLibelleForField(f)+" doit etre entre "+restriction.min()+" et "+restriction.max());
+		boolean minValide=false;
+		boolean maxValide=false;
+		boolean zeroValide=false;
+		Object minVal=UtileAffichage.numberVal(restriction.min(),f.getType());
+		Object maxVal=UtileAffichage.numberVal(restriction.max(),f.getType());
+		Object zeroVal=UtileAffichage.numberVal(0.0,f.getType());
+		String message=restriction.messageOnNoInvalide();
+		if(maxValide=(val>restriction.max() && restriction.max()!=0)){
+			message=message.length()!=0 ? message
+					: "La valeur du champ "+getLibelleForField(f)+" doit etre inferieur a "+maxVal;
+		}
+		if(minValide=(val<restriction.min() && restriction.min()!=0)){
+			message=message.length()!=0 ? message
+					: "La valeur du champ "+getLibelleForField(f)+" doit etre superieur a "+minVal;
+		}
+		if(zeroValide=(val==0 && !restriction.zeroInclue())){
+			message=message.length()!=0 ? message
+					: "La valeur du champ "+getLibelleForField(f)+" ne doit pas etre egal a "+zeroVal+" ";
+		}
+		if(maxValide || minValide){
+			message=message.length()!=0 ? message
+					: "La valeur du champ "+getLibelleForField(f)+" doit etre compris entre "+minVal+" et "+maxVal;
+		}
+		if(maxValide || minValide || zeroValide)
+		{
+			formError.put(f, message);
 		}
 	}
 	public Field getFieldByName(String name){

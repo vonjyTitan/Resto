@@ -3,6 +3,7 @@ package com.action;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import com.affichage.HTMLBuilder;
 import com.mapping.DataEntity;
 import com.rooteur.Action;
@@ -29,6 +30,7 @@ public class CrudAction extends Action {
 		entity=new HTMLBuilder(entity, request).getEntity();
 		if(!entity.isValide())
 		{
+			goTo(request,response,request.getHeader("Referer")+"?erreur=Champ invalide");
 			throw new Exception("Champ manquant");
 		}
 		DaoModele.getInstance().save(entity);
@@ -52,7 +54,7 @@ public class CrudAction extends Action {
 		entity=new HTMLBuilder(entity, request).getEntity();
 		if(!entity.isValide())
 		{
-			throw new Exception("Champ invalide");
+			goTo(request,response,request.getHeader("Referer")+"?erreur=Champ invalide");
 		}
 		if(DaoModele.getInstance().findById(entity)==null)
 		{

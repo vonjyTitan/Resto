@@ -1,6 +1,7 @@
 package com.mapping;
 
 import com.annotations.Entity;
+import com.annotations.NumberRestrict;
 import com.annotations.Parameter;
 import com.annotations.Required;
 import com.annotations.StringRestrict;
@@ -14,6 +15,7 @@ public class Table extends DataEntity {
 	private int positionx;
 	private int positiony;
 	private int etat;
+	@NumberRestrict(min=2)
 	private int place;
 	
 	public int getIdtable() {

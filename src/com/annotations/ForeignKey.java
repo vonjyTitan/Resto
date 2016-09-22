@@ -13,4 +13,5 @@ public @interface ForeignKey {
 	String libtable() default "";
 	boolean nullable() default false;
 	SELECT_TYPE selecttype() default SELECT_TYPE.OPTION;
+	String messageOnNotExiste() default "";
 }

@@ -9,7 +9,7 @@ var selectedTable=undefined;
 var onMouseUp=undefined;
 
 var inputStates = {};
-var colorEtat=["#5cb85c","#428bca","#f0ad4e","#f0ad4e"];
+var colorEtat=["blue","#5cb85c","#428bca","#f0ad4e","#f0ad4e"];
 
 // array of tables to animate
 var tableArray = [];
@@ -29,7 +29,7 @@ moovemodeVal,onMouseUpVal)
         div = $("#"+idDiv); 
         canvas.id     = "CursorLayer";
         canvas.width  = 500;
-        canvas.height = 175;
+        canvas.height = 250;
         canvas.style.zIndex   = 8;
        // canvas.style.position = "absolute";
         canvas.style.border   = "1px solid";
@@ -89,6 +89,8 @@ moovemodeVal,onMouseUpVal)
 function tableInpoint(valx,valy){
 	for(var i=0; i < tableArray.length; i++) {
       var table = tableArray[i];
+      if(!table.drawable)
+    	  continue;
 	var IsInCity=table.isClicked(valx,valy);
 	if(IsInCity){
 		return table;
@@ -140,9 +142,17 @@ function Table(x, y, diameter,nom,id,drawable,etat) {
       ctx.fill();
 	  ctx.font="20px Georgia";
 	  ctx.fillStyle = "white";
-	  ctx.fillText(nom,this.x-16,this.y+5);
+	  ctx.fillText(nom,this.x-14,this.y+7);
 	  ctx.fillStyle = colorEtat[this.etat];
-	  //arc vide ajout
+	  ctx.strokeStyle=colorEtat[this.etat];
+	  ctx.arc(this.x, this.y, this.radius-2,0,2*Math.PI);
+	  ctx.stroke();
+	  ctx.arc(this.x, this.y, this.radius-3,0,2*Math.PI);
+	  ctx.stroke();
+	  ctx.arc(this.x, this.y, this.radius-4,0,2*Math.PI);
+	  ctx.stroke();
+	  ctx.arc(this.x, this.y, this.radius-5,0,2*Math.PI);
+	  ctx.stroke();
   };
   
   this.move = function(mx,my) {

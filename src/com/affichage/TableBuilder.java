@@ -67,13 +67,14 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		reponse+="<tbody>";
 		for(DataEntity ob:data)
 		{
-			reponse+="<tr>";
+			Object valId=ob.getPkValue();
+			reponse+="<tr id=\"tr"+valId+"\">";
 			if(withcheckbox){
-				reponse+="<td style=\"text-align:left;\"><input type=\"checkbox\" value=\""+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"\" name=\""+entity.getPkName()+"\"/></td>";
+				reponse+="<td style=\"text-align:left;\"><input type=\"checkbox\" value=\""+valId+"\" name=\""+entity.getLibelleForField(entity.getFieldByName(entity.getPkName()))+"\"/></td>";
 			}
-			String idval="<td style=\"text-align:left;\">"+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"</td>";
+			String idval="<td style=\"text-align:left;\">"+valId+"</td>";
 			if(lienForId!=null){
-				idval="<td style=\"text-align:left;\"><a href=\""+lienForId+"&id="+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"\">"+ob.getValueForField(entity.getFieldByName(entity.getPkName()))+"</a></td>";
+				idval="<td style=\"text-align:left;\"><a href=\""+lienForId+"&id="+valId+"\">"+valId+"</a></td>";
 			}
 			
 			reponse+=idval;

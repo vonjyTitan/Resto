@@ -23,6 +23,13 @@ public class UtileAffichage {
 		}
 		return value;
 	}
+	public static Object numberVal(Double ob,Class type)
+	{
+		if(type.getSimpleName().compareToIgnoreCase("double")==0 || type.getSimpleName().compareToIgnoreCase("float")==0){
+			return ob;
+		}
+		return ob.intValue();
+	}
 	public static Object parseFromRequest(Object value,Class type) throws ParseException{
 		if(type.equals(java.util.Date.class) || type.equals(java.sql.Date.class))
 		{

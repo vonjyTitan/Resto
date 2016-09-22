@@ -111,7 +111,11 @@ public class Champ {
 	{
 		if(fk==null)throw new Exception("Pas de foreign key pour le champ "+nameField);
 		if(fk.toclasse()!=null){
-			List<DataEntity> rep=DaoModele.getInstance().findPageGenerique(1, (DataEntity)fk.toclasse().newInstance());
+			DataEntity entity=(DataEntity)fk.toclasse().newInstance();
+			if(fk.totable()!=null && !fk.totable().isEmpty())
+				entity.setNomTable(fk.totable());
+			entity.setPackSize(100);
+			List<DataEntity> rep=DaoModele.getInstance().findPageGenerique(1, entity);
 			ListPaginner<OptionObject> options=new ListPaginner<OptionObject>();
 			options.nbPage=((ListPaginner<DataEntity>)rep).nbPage;
 			for(DataEntity item:rep)

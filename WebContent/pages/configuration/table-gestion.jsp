@@ -27,6 +27,12 @@
 <div class="panel-body form-horizontal style-form" >
 <div class="cl-lg-12" id="tableEmpl">
 </div>
+<style>
+.selected td{
+	background-color:#b1b1ff !important;
+}
+
+</style>
 <div class="cl-lg-12">
 	<form action="table-modifplace" method="POST">
 		<%for(Table table:data){
@@ -50,6 +56,8 @@
 		initGestionTable("tableEmpl",tables,false,true,true,function(selected,xval,yval){
 			$("#"+selected.id+"x").val(xval);
 			$("#"+selected.id+"y").val(yval);
+			$(".selected").removeClass("selected");
+			$("#tr"+selected.id).addClass("selected");
 		});
 		
 	});

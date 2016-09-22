@@ -51,8 +51,8 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	}
 	public String beginHTMLForm()throws Exception{
 		String reponse="";	
-		 reponse+="<div class=\"row mt\">"
-		 	+"<div class=\"col-lg-12\">";
+		 /*reponse+="<div class=\"row mt\">"
+		 	+"<div class=\"col-lg-12\">";*/
 		String lien=request.getRequestURI()+"?cible="+request.getParameter("cible");
 		reponse+= "<form action=\""+lien+"\" method=\"POST\" name=\""+getEntity().getClass().getSimpleName().toLowerCase().toLowerCase()+"form\" id=\""+getEntity().getClass().getSimpleName().toLowerCase()+"form\" class=\""+classForForm+"\">";
 		return reponse;
@@ -103,8 +103,8 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	public String endHTMLForm(){
 		String reponse="";
 		reponse+="</form>";
-		reponse+="</div>";
-		reponse+="</div>";
+		/*reponse+="</div>";
+		reponse+="</div>";*/
 		return reponse;
 	}
 	public String getHTMLButton(){

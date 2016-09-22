@@ -41,6 +41,17 @@ public class Action {
 	protected void goTo(HttpServletRequest request,HttpServletResponse response,String url){
 		try {
 			if(request.getMethod().compareToIgnoreCase("post")==0){
+				goTo(request,response,"post",url);
+				return;
+			}
+			goTo(request,response,"get",url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	protected void goTo(HttpServletRequest request,HttpServletResponse response,String method,String url){
+		try {
+			if(method.compareToIgnoreCase("post")==0){
 				request.getRequestDispatcher(url).forward(request, response);
 				return;
 			}
