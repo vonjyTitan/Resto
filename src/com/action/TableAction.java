@@ -15,6 +15,7 @@ import com.rooteur.Action;
 
 import dao.Connecteur;
 import dao.DaoModele;
+import utilitaire.SessionUtil;
 
 public class TableAction extends Action {
 	public void modifplace(HttpServletRequest request,HttpServletResponse response) throws Exception{
@@ -89,6 +90,52 @@ public class TableAction extends Action {
 		}
 		table.setEtat(ConstantEtat.ETAT_LIBRE);
 		DaoModele.getInstance().save(table);
+		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
+	}
+	public void occuper(HttpServletRequest request,HttpServletResponse response) throws Exception
+	{
+		int id=Integer.valueOf(SessionUtil.getValForAttr(request, "id"));
+		Table toup=DaoModele.getInstance().findById(new Table(), id);
+		if(toup==null){
+			throw new Exception("Table introuvable");
+		}
+		if(toup.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || toup.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
+		{
+			throw new Exception("Impossible d'occuper la table car elle est deja pris");
+		}
+		if( toup.getEtat()==ConstantEtat.ETAT_RESERVER)
+		{
+			throw new Exception("Impossible d'occuper la table car elle est reserver");
+		}
+		toup.setEtat(ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE);
+		DaoModele.getInstance().update(toup);
+		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
+	}
+	public void liberer(HttpServletRequest request,HttpServletResponse response) throws Exception
+	{
+		int id=Integer.valueOf(SessionUtil.getValForAttr(request, "id"));
+		Table toup=DaoModele.getInstance().findById(new Table(), id);
+		if(toup==null){
+			throw new Exception("Table introuvable");
+		}
+		if(toup.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE){
+			throw new Exception("Impossible de liberer la table car il y a encore des commandes en cours pour elle");
+		}
+		toup.setEtat(ConstantEtat.ETAT_LIBRE);
+		DaoModele.getInstance().update(toup);
+		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
+	}
+	public void transfert(HttpServletRequest request,HttpServletResponse response)throws Exception
+	{
+		int id=Integer.valueOf(SessionUtil.getValForAttr(request, "id"));
+		Table toup=DaoModele.getInstance().findById(new Table(), id);
+		if(toup==null){
+			throw new Exception("Table introuvable");
+		}
+		if(toup.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || toup.getEtat()==ConstantEtat.ETAT_LIBRE){
+			throw new Exception("Impossible de transferer une table qui n'a aucun commande en cour");
+		}
+		//TRANSFERER
 		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 	}
 }
