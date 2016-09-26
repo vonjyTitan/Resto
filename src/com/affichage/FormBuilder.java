@@ -189,9 +189,14 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		String reponse="";
 		reponse+=select;
 		if(select.length()==0){
-			reponse+=getTypeForField(field)+" name=\""+field.getName()+"\" id=\""+field.getName()+"\" value=\""+defaultValudeForField(field)+"\" class=\""+classe+"\" "+add+">";
+			reponse+=getTypeForField(field)+" name=\""+field.getName()+"\" id=\""+field.getName()+"\"  class=\""+classe+"\" "+add+" "+getEndInput(field,defaultValudeForField(field));
 		}
 		return reponse;
+	}
+	private String getEndInput(Champ field,Object value){
+		if(field.isTextarea())
+			return ">"+value+"</textarea>";
+		return "value=\""+value+"\" />";
 	}
 	private String getTypeForField(Champ f)throws Exception{
 		if(getEntity().isNumberType(f.getType())){
@@ -205,6 +210,9 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 			if((boolean)defaultValudeForField(f)==true)
 				return "<input type=\"checkbox\" checked=\"checked\"";
 			return "<input type=\"checkbox\" checked=\"\"";
+		}
+		if(f.isTextarea()){
+			return "<textarea ";
 		}
 		return "<input type=\"text\"";
 	}
@@ -312,6 +320,17 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		if(field==null)
 			throw new Exception("Champ "+champ+" introuvable");
 		classForChamp.put(field, classe);
+	}
+	public void setChampTextarea(String[] champs)throws Exception
+	{
+		for(String champ:champs)
+			setChampTextarea(champ);
+	}
+	public void setChampTextarea(String champ)throws Exception{
+		Champ f=getFieldByName(champ);
+		if(f==null)
+			throw new Exception("Champ "+champ+" introuvable");
+		f.setTextarea(true);
 	}
 	public String getDefauldClassForLabel() {
 		return defauldClassForLabel;

@@ -135,6 +135,7 @@ function Table(x, y, diameter,nom,id,drawable,etat) {
 		var IsInCity = (dx*dx+dy*dy)<(radius*radius);
 		return IsInCity;
   };
+  
   this.draw = function() {
       ctx.beginPath();
 	  ctx.fillStyle = "blue";

@@ -16,6 +16,7 @@ import com.rooteur.Action;
 import dao.Connecteur;
 import dao.DaoModele;
 import utilitaire.SessionUtil;
+import utilitaire.Utilitaire;
 
 public class TableAction extends Action {
 	public void modifplace(HttpServletRequest request,HttpServletResponse response) throws Exception{
@@ -71,6 +72,12 @@ public class TableAction extends Action {
 			table.setPositiony(ancien.getPositiony());
 			table.setEtat(ancien.getEtat());
 			
+			if(!table.isValide())
+			{
+				goTo(request,response,"main.jsp?cible=configuration/table-modif&erreur=Champ invalide");
+				return;
+			}
+			
 			DaoModele.getInstance().update(table);
 			
 			goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
@@ -94,48 +101,117 @@ public class TableAction extends Action {
 	}
 	public void occuper(HttpServletRequest request,HttpServletResponse response) throws Exception
 	{
-		int id=Integer.valueOf(SessionUtil.getValForAttr(request, "id"));
-		Table toup=DaoModele.getInstance().findById(new Table(), id);
-		if(toup==null){
-			throw new Exception("Table introuvable");
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(new Table().findDataBaseKey());
+			conn.setAutoCommit(false);
+			
+			String[] id=request.getParameterValues("id");
+			if(id==null || id.length==0){
+				throw new Exception("Aucune table selectinner");
+			}
+			String inter=Utilitaire.concatListe(id, ",", "");
+			List<Table> toup=DaoModele.getInstance().findPageGenerique(1,new Table(),conn," and idtable in ("+inter+") ");
+			if(toup.size()!=id.length){
+				throw new Exception("Table introuvable");
+			}
+			for(Table tu:toup)
+			{
+				if(tu.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
+				{
+					throw new Exception("Impossible d'occuper la table car elle est deja pris");
+				}
+				if( tu.getEtat()==ConstantEtat.ETAT_RESERVER)
+				{
+					throw new Exception("Impossible d'occuper la table car elle est reserver");
+				}
+				tu.setEtat(ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE);
+			}
+			DaoModele.getInstance().update(toup,conn,"");
+			conn.commit();
+			goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 		}
-		if(toup.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || toup.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
-		{
-			throw new Exception("Impossible d'occuper la table car elle est deja pris");
+		catch(Exception ex){
+			if(conn!=null)
+				conn.rollback();
+			throw ex;
 		}
-		if( toup.getEtat()==ConstantEtat.ETAT_RESERVER)
-		{
-			throw new Exception("Impossible d'occuper la table car elle est reserver");
+		finally{
+			if(conn!=null)
+				conn.close();
 		}
-		toup.setEtat(ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE);
-		DaoModele.getInstance().update(toup);
-		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 	}
 	public void liberer(HttpServletRequest request,HttpServletResponse response) throws Exception
 	{
-		int id=Integer.valueOf(SessionUtil.getValForAttr(request, "id"));
-		Table toup=DaoModele.getInstance().findById(new Table(), id);
-		if(toup==null){
-			throw new Exception("Table introuvable");
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(new Table().findDataBaseKey());
+			conn.setAutoCommit(false);
+			
+			String[] id=request.getParameterValues("id");
+			if(id==null || id.length==0){
+				throw new Exception("Aucune table selectinner");
+			}
+			String inter=Utilitaire.concatListe(id, ",", "");
+			List<Table> toup=DaoModele.getInstance().findPageGenerique(1,new Table(),conn," and idtable in ("+inter+") ");
+			if(toup.size()!=id.length){
+				throw new Exception("Table introuvable");
+			}
+			for(Table tu:toup)
+			{
+				
+				if(tu.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE){
+					throw new Exception("Impossible de liberer la table car il y a encore des commandes en cours pour elle");
+				}
+				tu.setEtat(ConstantEtat.ETAT_LIBRE);
+			}
+			DaoModele.getInstance().update(toup,conn,"");
+			conn.commit();
+			goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 		}
-		if(toup.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE){
-			throw new Exception("Impossible de liberer la table car il y a encore des commandes en cours pour elle");
+		catch(Exception ex){
+			if(conn!=null)
+				conn.rollback();
+			throw ex;
 		}
-		toup.setEtat(ConstantEtat.ETAT_LIBRE);
-		DaoModele.getInstance().update(toup);
-		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
+		finally{
+			if(conn!=null)
+				conn.close();
+		}
 	}
-	public void transfert(HttpServletRequest request,HttpServletResponse response)throws Exception
+	public void transferer(HttpServletRequest request,HttpServletResponse response)throws Exception
 	{
-		int id=Integer.valueOf(SessionUtil.getValForAttr(request, "id"));
-		Table toup=DaoModele.getInstance().findById(new Table(), id);
-		if(toup==null){
-			throw new Exception("Table introuvable");
-		}
-		if(toup.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || toup.getEtat()==ConstantEtat.ETAT_LIBRE){
-			throw new Exception("Impossible de transferer une table qui n'a aucun commande en cour");
-		}
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(new Table().findDataBaseKey());
+			conn.setAutoCommit(false);
+			
+			String[] id=request.getParameterValues("id");
+			if(id==null || id.length==0){
+				throw new Exception("Aucune table selectinner");
+			}
+			String inter=Utilitaire.concatListe(id, ",", "");
+			List<Table> toup=DaoModele.getInstance().findPageGenerique(1,new Table(),conn," and idtable in ("+inter+") ");
+			if(toup.size()!=id.length){
+				throw new Exception("Table introuvable");
+			}
+			for(Table tu:toup)
+			{
+				if(tu.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_LIBRE){
+					throw new Exception("Impossible de transferer une table qui n'a aucun commande en cour");
+				}
+			}
 		//TRANSFERER
 		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
+	}
+	catch(Exception ex){
+		if(conn!=null)
+			conn.rollback();
+		throw ex;
+	}
+	finally{
+		if(conn!=null)
+			conn.close();
+	}
 	}
 }

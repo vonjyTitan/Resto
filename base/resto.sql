@@ -80,7 +80,13 @@ INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'configuration/table-ajout'),
 (2, 'configuration/table-ajout'),
 (1, 'table-ajout'),
-(2, 'table-ajout');
+(2, 'table-ajout'),
+(1, 'table-occuper'),
+(2, 'table-occuper'),
+(1, 'table-liberer'),
+(2, 'table-liberer'),
+(1, 'table-transferer'),
+(2, 'table-transferer');
 
 -- --------------------------------------------------------
 

@@ -344,6 +344,8 @@ public class DaoModele {
 						val=(inter!=null) ? new java.sql.Date(((java.util.Date) inter).getTime()) : null ;
 					}
 					else val=m.invoke(data.get(ii), null);
+					if(val==null && champs[i].getType().equals(String.class))
+						val="";
 					pst.setObject(indiceStat, val);
 					indiceStat++;
 				}
@@ -450,6 +452,8 @@ public class DaoModele {
 		return objet.findReference()+" WHERE "+getCondition(objet,conn,apresWhere);
 	}
 	public <T extends DataEntity> void update(List<T> liste,Connection conn,String apresWhere)throws Exception{
+		if(liste.size()==0)
+			throw new Exception("Liste vide");
 		String[]col=colModif(liste.get(0));
 		String query=getRequetteModif(liste.get(0),col);
 		if(apresWhere!=null)
@@ -472,6 +476,8 @@ public class DaoModele {
 					if(valeur!= null && valeur.getClass().equals(java.util.Date.class))
 						prstat.setObject(comptset, new java.sql.Date(((java.util.Date)valeur).getTime()));
 					else {
+						if(valeur==null && liste.get(0).getFieldByName(s).getType().equals(String.class))
+							valeur="";
 						prstat.setObject(comptset, valeur);
 					}
 					comptset++;

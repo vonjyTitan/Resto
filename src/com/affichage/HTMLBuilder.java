@@ -102,6 +102,8 @@ public class HTMLBuilder<T extends DataEntity> {
 	}
 	public void setEntity(T entity)throws Exception  {
 		entity.setNomTable(this.entity.findReference());
+		entity.setLienForModif(this.entity.getLienForModif());
+		entity.setLienForDelete(this.entity.findLienForDelete());
 		this.entity = entity;
 	}
 	protected Object defaultValudeForField(Champ f) throws Exception{

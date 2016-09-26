@@ -55,6 +55,7 @@ public abstract class DataEntity {
 	private static Map<Class,Field[]> fieldsForClasses=new HashMap<Class,Field[]>();
 	private int count=0;
 	private String lienForModif="";
+	private String lienForDelete="";
 	public int findPackSize() {
 		return packSize;
 	}
@@ -204,12 +205,13 @@ public abstract class DataEntity {
 					else if((annotation=f.getAnnotation(NumberRestrict.class))!=null){
 						valideChampNumber(f, (NumberRestrict) annotation, value);
 					}
-					ForeignKey fk=null;
-					if((fk=f.getAnnotation(ForeignKey.class))!=null && isNumberType(f.getType())){
-						if((int)value==0 && fk.nullable())
-							continue;
-						valideChampFK(f,fk,value);
-					}
+					
+				}
+				ForeignKey fk=null;
+				if((fk=f.getAnnotation(ForeignKey.class))!=null && isNumberType(f.getType())){
+					if((int)value==0 && fk.nullable())
+						continue;
+					valideChampFK(f,fk,value);
 				}
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
@@ -227,10 +229,10 @@ public abstract class DataEntity {
 				DataEntity entity=(DataEntity) fk.toclasse().newInstance();
 				if(fk.totable()!=null && !fk.totable().isEmpty())
 					entity.setNomTable(fk.totable());
-				entity=DaoModele.getInstance().findById(entity, (int)entity.getPkValue());
-				if(entity==null){
+				DataEntity res=DaoModele.getInstance().findById(entity, (int)value);
+				if(res==null){
 					formError.put(f, (fk.messageOnNotExiste()!=null && !fk.messageOnNotExiste().isEmpty())
-							? fk.messageOnNotExiste() : "La valeur du champ "+this.getReferenceForField(f)+" doit etre dans "+entity.findReference());
+							? fk.messageOnNotExiste() : "La valeur du champ "+this.getLibelleForField(f)+" doit etre dans "+entity.findReference());
 				}
 				return;
 			}
@@ -466,10 +468,14 @@ public abstract class DataEntity {
 		return  this.getValueForField(this.getFieldByName(this.getPkName()));
 	}
 	public String getOption() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		String reponse="";
 		if(lienForModif!=null && !lienForModif.isEmpty()){
-			return " <a href=\""+lienForModif+"&id="+getValueForField(getFieldByName(getPkName()))+"\" class=\"btn btn-primary btn-xs\"><i class=\"fa fa-pencil\"></i></a> ";
+			reponse+=" <a href=\""+lienForModif+"&id="+getValueForField(getFieldByName(getPkName()))+"\" class=\"btn btn-primary btn-xs\"><i class=\"fa fa-pencil\"></i></a> ";
 		}
-		return "";
+		if(lienForDelete!=null && !lienForDelete.isEmpty()){
+			reponse+=" <a href=\""+lienForDelete+"&id="+getValueForField(getFieldByName(getPkName()))+"\" class=\"btn btn-danger btn-xs\"><i class=\"fa fa-trash-o\"></i></a> ";
+		}
+		return (reponse.isEmpty()) ? "-" : reponse;
 	}
 	public void addCountChamp(String champ)throws Exception{
 		Field f=this.getFieldByName(champ);
@@ -576,6 +582,14 @@ public abstract class DataEntity {
 
 	public void setLienForModif(String lienForModif) {
 		this.lienForModif = lienForModif;
+	}
+
+	public String findLienForDelete() {
+		return lienForDelete;
+	}
+
+	public void setLienForDelete(String lienForDelete) {
+		this.lienForDelete = lienForDelete;
 	}
 	
 }

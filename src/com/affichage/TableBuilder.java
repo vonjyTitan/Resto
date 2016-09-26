@@ -44,7 +44,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		this.request=request;
 	}
 	
-	public String getHTML(boolean withcheckbox) throws Exception{
+	public String getHTML(boolean withcheckbox,String nomCheckbox) throws Exception{
 		testData();
 		String reponse="<div class=\"col-lg-12 col-md-12 col-sm-12 table-responsive\">";
 		reponse+="<table class=\""+getClassForTabe()+"\">";
@@ -70,7 +70,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 			Object valId=ob.getPkValue();
 			reponse+="<tr id=\"tr"+valId+"\">";
 			if(withcheckbox){
-				reponse+="<td style=\"text-align:left;\"><input type=\"checkbox\" value=\""+valId+"\" name=\""+entity.getLibelleForField(entity.getFieldByName(entity.getPkName()))+"\"/></td>";
+				reponse+="<td style=\"text-align:left;\"><input type=\"checkbox\" value=\""+valId+"\" name=\""+nomCheckbox+"\"/></td>";
 			}
 			String idval="<td style=\"text-align:left;\">"+valId+"</td>";
 			if(lienForId!=null){
@@ -95,6 +95,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 					reponse+="<td style=\"text-align:left;\">"+getLienForField(f.getField(), value)+"</td>";
 			}
 			ob.setLienForModif(entity.getLienForModif());
+			ob.setLienForDelete(entity.findLienForDelete());
 			reponse+="<td style=\"text-align:left;\">"+ob.getOption()+"</td>";
 			reponse+="</tr>";
 		}
@@ -189,10 +190,13 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 			setLienForChamp(champ[i],lien[i],nomidchamp[i]);
 	}
 	public String getHTML() throws Exception{
-		return getHTML(false);
+		return getHTML(false,"");
 	}
 	public String getHTMLWithCheckbox() throws Exception{
-		return getHTML(true);
+		return getHTML(true,entity.getPkName());
+	}
+	public String getHTMLWithCheckbox(String checkboxName) throws Exception{
+		return getHTML(true,checkboxName);
 	}
 	public List<T> getData() {
 		return data;
@@ -245,6 +249,9 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		catch(Exception ex){
 			
 		}
+	}
+	public void setLienForDelete(String lien){
+		this.entity.setLienForDelete(lien);
 	}
 	public void setLien(String lien) {
 		this.lien = lien;

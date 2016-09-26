@@ -30,8 +30,8 @@ public class CrudAction extends Action {
 		entity=new HTMLBuilder(entity, request).getEntity();
 		if(!entity.isValide())
 		{
-			goTo(request,response,request.getHeader("Referer")+"?erreur=Champ invalide");
-			throw new Exception("Champ manquant");
+			goTo(request,response,SessionUtil.getValForAttr(request, "refereur")+"&erreur=Champ invalide");
+			return;
 		}
 		DaoModele.getInstance().save(entity);
 		String cible=SessionUtil.getValForAttr(request, "cible");
@@ -54,7 +54,8 @@ public class CrudAction extends Action {
 		entity=new HTMLBuilder(entity, request).getEntity();
 		if(!entity.isValide())
 		{
-			goTo(request,response,request.getHeader("Referer")+"?erreur=Champ invalide");
+			goTo(request,response,SessionUtil.getValForAttr(request, "refereur")+"&erreur=Champ invalide");
+			return;
 		}
 		if(DaoModele.getInstance().findById(entity)==null)
 		{

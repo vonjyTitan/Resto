@@ -321,7 +321,7 @@ try{
 			                          <i class="fa fa-liste"></i>
 			                          <span>Menu</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des menus</a>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/menu-liste&currmenu=menu-menu-liste" id="menu-menu-liste">Liste des menus</a>
 			                      <li><a  href="blank.html">Ajout menu</a>
 			                      </li>
 			                      </ul>
@@ -329,10 +329,10 @@ try{
 	                      <li class="sub-menu">
 			                      <a href="javascript:;" >
 			                          <i class="fa fa-object-group"></i>
-			                          <span>Classement de menu</span>
+			                          <span>Famille de menu</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des classements de menu</a>
-			                      <li><a  href="blank.html">Ajout classement</a>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/famille-liste&currmenu=menu-famille-liste" id="menu-famille-liste">Liste des familles</a>
+			                      <li><a  href="main.jsp?cible=configuration/famille-ajout&currmenu=menu-famille-ajout" id="menu-famille-ajout">Ajout famille</a>
 			                      </li>
 			                      </ul>
 	                      </li>

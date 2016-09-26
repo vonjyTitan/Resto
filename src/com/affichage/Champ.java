@@ -25,6 +25,7 @@ public class Champ {
 	private Method methodForChamp=null;
 	private DataEntity entity=null;
 	private ForeignKey fk=null;
+	private boolean isTextarea=false;
 	
 	public ForeignKey getFk() {
 		return fk;
@@ -130,5 +131,11 @@ public class Champ {
 		option.setReferenceForField("val", fk.libtable());
 		option.setPackSize(100);
 		return DaoModele.getInstance().findPageGenerique(1, option);
+	}
+	public boolean isTextarea() {
+		return isTextarea;
+	}
+	public void setTextarea(boolean isTextarea) {
+		this.isTextarea = isTextarea;
 	}
 }

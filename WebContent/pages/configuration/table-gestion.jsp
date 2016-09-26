@@ -15,7 +15,18 @@
 <h3>Gestion des tables</h3>
 <%
 	out.print(HTMLBuilder.beginPanel("Liste des tables", 6));
-	out.print(builder.getHTML());
+%>
+<form id="action-multiple" action="table-actionmultiple" method="post">
+<%
+	out.print(builder.getHTMLWithCheckbox("id"));
+%>
+<div class="form-group col-lg-12" style="text-align:right;">
+	<input type="submit" value="Occuper" data="table-occuper" id="occuperbouton" class="btn btn-primary btn-xs"/>
+	<input type="submit" value="Liberer" data="table-liberer" class="btn btn-success btn-xs" id="libererbouton"/>
+	<input type="submit" value="Transferer" data="table-transferer" class="btn btn-warning btn-xs" id="transfererbouton"/>
+</div>
+</form>
+<%
 	out.print(HTMLBuilder.endPanel());
 	List<Table> data=builder.getData();
 %>
@@ -58,6 +69,9 @@
 			$("#"+selected.id+"y").val(yval);
 			$(".selected").removeClass("selected");
 			$("#tr"+selected.id).addClass("selected");
+		});
+		$("input.btn").on("click",function(){
+			$("#action-multiple").attr("action",$(this).attr("data"));
 		});
 		
 	});
