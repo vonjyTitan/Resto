@@ -1,17 +1,14 @@
 package com.mapping;
 
 import com.annotations.Entity;
-import com.annotations.Parameter;
 import com.annotations.Required;
 
-@Entity(pkName="idcategorie",reference="categorie")
-public class CategorieMenue extends DataEntity{
+@Entity(pkName="idcategorie",reference="categorie_article")
+public class CategorieArticle extends DataEntity {
 	private int idcategorie;
-	@Parameter(libelle="Nom de la categorie")
 	@Required
 	private String libelle;
-	private String caracteristique;
-	
+	private String description;
 	public int getIdcategorie() {
 		return idcategorie;
 	}
@@ -24,11 +21,10 @@ public class CategorieMenue extends DataEntity{
 	public void setLibelle(String libelle) {
 		this.libelle = libelle;
 	}
-	public String getCaracteristique() {
-		return caracteristique;
+	public String getDescription() {
+		return description;
 	}
-	public void setCaracteristique(String caracteristique) {
-		this.caracteristique = caracteristique;
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	
 }

@@ -273,13 +273,13 @@ try{
                           <span>Configuration stock</span>
                       </a>
                       <ul class="sub">
-	                      <li class="sub-menu">
+                      	 <li class="sub-menu">
 			                      <a href="javascript:;" >
-			                          <i class="fa fa-object-group"></i>
-			                          <span>Categorie d'article</span>
+			                         <!--  <i class="fa fa-users"></i>-->
+			                          <span>Article</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des categories</a></li>
-			                      <li><a href="main.jsp?cible=menu/categorie-saisie&currmenu=menu-cat-saisie" id="menu-cat-saisie">Ajout categorie</a><li>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/article-liste&currmenu=menu-article-liste" id="menu-article-liste">Liste des articles</a></li>
+			                      <li><a  href="main.jsp?cible=configuration/article-ajout&currmenu=menu-article-ajout" id="menu-article-ajout">Ajout article</a></li>
 			                      </ul>
 	                      </li>
                           <li class="sub-menu">
@@ -287,7 +287,17 @@ try{
 			                         <!--  <i class="fa fa-users"></i>-->
 			                          <span>Unite d'article</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des unites</a></li>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/unite-liste&currmenu=menu-unite-liste" id="menu-unite-liste">Liste des unites</a></li>
+			                      <li><a  href="main.jsp?cible=configuration/unite-ajout&currmenu=menu-unite-ajout" id="menu-unite-ajout">Ajout unite</a></li>
+			                      </ul>
+	                      </li>
+	                      <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                         <!--  <i class="fa fa-users"></i>-->
+			                          <span>Categorie d'article</span>
+			                      </a>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/categorie-liste&currmenu=menu-categorie-liste" id="menu-categorie-liste">Liste des categories</a></li>
+			                      <li><a  href="main.jsp?cible=configuration/categorie-ajout&currmenu=menu-categorie-ajout" id="menu-categorie-ajout">Categorie ajout</a></li>
 			                      </ul>
 	                      </li>
                       </ul>
@@ -401,8 +411,8 @@ try{
       <!--footer start-->
       <footer class="site-footer">
           <div class="text-center">
-              2016 - Tamatave
-              <a href="index.html#" class="go-top">
+              2016 - Resto Tamatave
+              <a href="#" class="go-top">
                   <i class="fa fa-angle-up"></i>
               </a>
           </div>

@@ -59,10 +59,14 @@ public class HTMLBuilder<T extends DataEntity> {
 		for(int i=0;i<champ.length;i++)
 			setLibelleFor(champ[i],nom[i]);
 	}
-	public static String beginPanel(String title,int taille){
-		return "<div class=\"col-lg-"+taille+" col-md-"+taille+" col-sm-"+taille+" mt\">"
+
+	public static String beginPanel(String title,int taille,String mg){
+		return "<div class=\"col-lg-"+taille+" col-md-"+taille+" col-sm-"+taille+" "+mg+"\">"
 				+"<div class=\"panel panel-primary box-solid\">"
  		+"<div class=\"blue-header\"><h5>"+title+"</h5></div><div class=\"panel-body form-horizontal style-form\">";
+	}
+	public static String beginPanel(String title,int taille){
+		return beginPanel(title,taille,"mt");
 	}
 	public static String beginPanel(String title){
 		return beginPanel(title,6);

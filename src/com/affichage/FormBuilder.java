@@ -63,7 +63,8 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 			conn=Connecteur.getConnection(entity.findDataBaseKey());
 			String reponse="";
 			for(Champ f:fieldsAvalaible){
-				if(!DaoModele.getInstance().isExisteChamp(entity.getReferenceForField(f.getField()), entity.findReference(), conn))
+				
+				if(f.getField()!=null && !DaoModele.getInstance().isExisteChamp(entity.getReferenceForField(f.getField()), entity.findReference(), conn))
 					continue;
 				reponse+=blockFor(f,false); 
 			}

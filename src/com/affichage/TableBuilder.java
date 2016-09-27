@@ -86,8 +86,11 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 				if(f.getField().getType().equals(Date.class) || f.getField().getType().equals(java.sql.Date.class)){
 					value=UtileAffichage.formatAfficherDate((java.sql.Date) value);
 				}
-				else if(f.getField().getType().equals(Double.class) || f.getField().getType().equals(double.class) || f.getField().getType().equals(Float.class) || f.getField().getType().equals(float.class)){
+				else if(value!=null && (value.getClass().equals(Double.class) || value.getClass().equals(double.class) || value.getClass().equals(Float.class) || value.getClass().equals(float.class))){
 					value=UtileAffichage.formatMoney((double) value);
+				}
+				else if(f.getField().getType().equals(String.class)){
+					value=UtileAffichage.getNonNullValue(value, f.getField().getType());
 				}
 				if(value !=null && DataEntity.isNumberType(value.getClass()))
 					reponse+="<td>"+getLienForField(f.getField(), value)+"</td>";

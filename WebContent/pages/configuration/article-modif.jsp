@@ -8,10 +8,10 @@
 
 <jsp:include page='../verificateur.jsp'/>
 <%
-	InsertUpdateBuilder builder=new InsertUpdateBuilder(new MenuFamille(),"crud-update?classenom=com.mapping.MenuFamille&cible=configuration/famille-liste&refereur=main.jsp?cible=configuration/famille-modif",request);
+	InsertUpdateBuilder builder=new InsertUpdateBuilder(new ArticleStock(),"crud-update?classenom=com.mapping.ArticleStock&cible=configuration/article-liste&refereur=main.jsp?cible=configuration/article-update",request);
 	builder.setChampTextarea("description");
-	builder.addNotVisibleChamp("idfamille");
 	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
+	builder.addNotVisibleChamp(new String[]{"idarticle","quantite"});
 %>
-<h3><a href="main.jsp?cible=configuration/famille-liste"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Modification famille menu</h3>
+	<h3><a href="main.jsp?cible=configuration/article-liste"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Modification article</h3>
 <%=builder.getHTML(6)%>
