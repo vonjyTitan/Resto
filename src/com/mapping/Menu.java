@@ -3,12 +3,15 @@ package com.mapping;
 import com.annotations.Entity;
 import com.annotations.ForeignKey;
 import com.annotations.Parameter;
+import com.annotations.Required;
 
 @Entity(pkName="idmenu",reference="menu")
 public class Menu extends DataEntity {
 	private int idmenu;
+	@Required
 	private String libelle;
 	private String description;
+	@Required
 	private double prix;
 	@Parameter(libelle="Famille")
 	@ForeignKey(toclasse=MenuFamille.class,libtable="libelle",pktable="idfamille")

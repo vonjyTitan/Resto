@@ -332,7 +332,7 @@ try{
 			                          <span>Menu</span>
 			                      </a>
 			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/menu-liste&currmenu=menu-menu-liste" id="menu-menu-liste">Liste des menus</a>
-			                      <li><a  href="blank.html">Ajout menu</a>
+			                      <li><a  href="main.jsp?cible=configuration/menu-ajout&currmenu=menu-menu-ajout" id="menu-menu-ajout">Ajout menu</a>
 			                      </li>
 			                      </ul>
 	                      </li>
