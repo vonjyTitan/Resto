@@ -8,7 +8,7 @@
 
 <jsp:include page='../verificateur.jsp'/>
 <%
-	InsertUpdateBuilder builder=new InsertUpdateBuilder(new ArticleStock(),"crud-update?classenom=com.mapping.ArticleStock&cible=configuration/article-liste&refereur=main.jsp?cible=configuration/article-update",request);
+	InsertUpdateBuilder builder=new InsertUpdateBuilder(new ArticleStock(),"crud-update?classenom=com.mapping.ArticleStock&cible=configuration/article-liste&refereur=main.jsp?cible=configuration/article-modif",request);
 	builder.setChampTextarea("description");
 	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
 	builder.addNotVisibleChamp(new String[]{"idarticle","quantite"});

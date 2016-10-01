@@ -14,6 +14,7 @@
 	TableBuilder builder=new TableBuilder(crit,request);
 	builder.addNotVisibleChamp("idfamille");
 	builder.setLienForModif("main.jsp?cible=configuration/menu-modif");
+	builder.setLienForId("main.jsp?cible=configuration/menu-fiche");
 	builder.setLienForDelete("menu-supprimer");
 	builder.getFilterBuilder().setChampToInterval("prix");
 %>

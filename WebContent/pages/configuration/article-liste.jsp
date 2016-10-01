@@ -13,7 +13,7 @@
 	TableBuilder builder=new TableBuilder(critArticle,request);
 	builder.removeChamp(new String[]{"idcategorie","idunite"});
 	builder.getFilterBuilder().setChampToInterval("quantite");
-	builder.getFilterBuilder().removeChamp("idunite");
+	builder.getFilterBuilder().removeChamp(new String[]{"idunite","unite"});
 	builder.getFieldByName("quantite").setMethodForChamp("findQuantite");
 	builder.setLienForId("main.jsp?cible=configuration/article-fiche");
 	builder.setLienForModif("main.jsp?cible=configuration/article-modif");
