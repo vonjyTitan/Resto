@@ -227,7 +227,7 @@ try{
               <!-- sidebar menu start-->
               <ul class="sidebar-menu" id="nav-accordion">
               
-              	  <p class="centered"><a href="profile.html"><img src="assets/img/icon2.png" class="img-circle" width="60"></a></p>
+              	  <!-- <p class="centered"><a href="profile.html"><img src="assets/img/icon2.png" class="img-circle" width="60"></a></p>-->
               	  <h5 class="centered"><%=((Utilisateur)request.getSession().getAttribute("utilisateur")).getNom()%></h5>
                   <li class="mt">
                       <a class="active" id="menu-ecceuil" href="main.jsp?cible=stat&currmenu=menu-ecceuil" >
@@ -273,13 +273,13 @@ try{
                           <span>Configuration stock</span>
                       </a>
                       <ul class="sub">
-	                      <li class="sub-menu">
+                      	 <li class="sub-menu">
 			                      <a href="javascript:;" >
-			                          <i class="fa fa-object-group"></i>
-			                          <span>Categorie d'article</span>
+			                         <!--  <i class="fa fa-users"></i>-->
+			                          <span>Article</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des categories</a></li>
-			                      <li><a href="main.jsp?cible=menu/categorie-saisie&currmenu=menu-cat-saisie" id="menu-cat-saisie">Ajout categorie</a><li>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/article-liste&currmenu=menu-article-liste" id="menu-article-liste">Liste des articles</a></li>
+			                      <li><a  href="main.jsp?cible=configuration/article-ajout&currmenu=menu-article-ajout" id="menu-article-ajout">Ajout article</a></li>
 			                      </ul>
 	                      </li>
                           <li class="sub-menu">
@@ -287,7 +287,17 @@ try{
 			                         <!--  <i class="fa fa-users"></i>-->
 			                          <span>Unite d'article</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des unites</a></li>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/unite-liste&currmenu=menu-unite-liste" id="menu-unite-liste">Liste des unites</a></li>
+			                      <li><a  href="main.jsp?cible=configuration/unite-ajout&currmenu=menu-unite-ajout" id="menu-unite-ajout">Ajout unite</a></li>
+			                      </ul>
+	                      </li>
+	                      <li class="sub-menu">
+			                      <a href="javascript:;" >
+			                         <!--  <i class="fa fa-users"></i>-->
+			                          <span>Categorie d'article</span>
+			                      </a>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/categorie-liste&currmenu=menu-categorie-liste" id="menu-categorie-liste">Liste des categories</a></li>
+			                      <li><a  href="main.jsp?cible=configuration/categorie-ajout&currmenu=menu-categorie-ajout" id="menu-categorie-ajout">Categorie ajout</a></li>
 			                      </ul>
 	                      </li>
                       </ul>
@@ -321,18 +331,18 @@ try{
 			                          <i class="fa fa-liste"></i>
 			                          <span>Menu</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des menus</a>
-			                      <li><a  href="blank.html">Ajout menu</a>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/menu-liste&currmenu=menu-menu-liste" id="menu-menu-liste">Liste des menus</a>
+			                      <li><a  href="main.jsp?cible=configuration/menu-ajout&currmenu=menu-menu-ajout" id="menu-menu-ajout">Ajout menu</a>
 			                      </li>
 			                      </ul>
 	                      </li>
 	                      <li class="sub-menu">
 			                      <a href="javascript:;" >
 			                          <i class="fa fa-object-group"></i>
-			                          <span>Classement de menu</span>
+			                          <span>Famille de menu</span>
 			                      </a>
-			                      <ul class="sub"><li><a  href="blank.html">Liste des classements de menu</a>
-			                      <li><a  href="blank.html">Ajout classement</a>
+			                      <ul class="sub"><li><a  href="main.jsp?cible=configuration/famille-liste&currmenu=menu-famille-liste" id="menu-famille-liste">Liste des familles</a>
+			                      <li><a  href="main.jsp?cible=configuration/famille-ajout&currmenu=menu-famille-ajout" id="menu-famille-ajout">Ajout famille</a>
 			                      </li>
 			                      </ul>
 	                      </li>
@@ -401,8 +411,8 @@ try{
       <!--footer start-->
       <footer class="site-footer">
           <div class="text-center">
-              2016 - Tamatave
-              <a href="index.html#" class="go-top">
+              2016 - Resto Tamatave
+              <a href="#" class="go-top">
                   <i class="fa fa-angle-up"></i>
               </a>
           </div>

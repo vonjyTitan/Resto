@@ -27,7 +27,7 @@ public class Action {
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			Serveur.back(request, response,e.getMessage());
+			Serveur.back(request, response,e.getCause().getMessage());
 			return;
 		} 
 	}

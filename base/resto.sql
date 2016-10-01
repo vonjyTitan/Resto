@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Mar 20 Septembre 2016 à 20:14
+-- Généré le: Sam 01 Octobre 2016 à 06:44
 -- Version du serveur: 5.5.24-log
 -- Version de PHP: 5.3.13
 
@@ -20,6 +20,144 @@ SET time_zone = "+00:00";
 -- Base de données: `resto`
 --
 
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `article_stock`
+--
+
+CREATE TABLE IF NOT EXISTS `article_stock` (
+  `idarticle` int(11) NOT NULL AUTO_INCREMENT,
+  `libelle` varchar(100) NOT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  `idcategorie` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `idunite` int(11) NOT NULL,
+  PRIMARY KEY (`idarticle`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+--
+-- Contenu de la table `article_stock`
+--
+
+INSERT INTO `article_stock` (`idarticle`, `libelle`, `description`, `idcategorie`, `quantite`, `idunite`) VALUES
+(2, 'Poulet de chaire', '', 1, 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `article_stock_libelle`
+--
+CREATE TABLE IF NOT EXISTS `article_stock_libelle` (
+`idarticle` int(11)
+,`libelle` varchar(100)
+,`description` varchar(100)
+,`idcategorie` int(11)
+,`quantite` int(11)
+,`idunite` int(11)
+,`categorie` varchar(100)
+,`unite` varchar(100)
+);
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `categorie_article`
+--
+
+CREATE TABLE IF NOT EXISTS `categorie_article` (
+  `idcategorie` int(11) NOT NULL AUTO_INCREMENT,
+  `libelle` varchar(100) NOT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`idcategorie`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+
+--
+-- Contenu de la table `categorie_article`
+--
+
+INSERT INTO `categorie_article` (`idcategorie`, `libelle`, `description`) VALUES
+(1, 'Viande', ''),
+(2, 'Boisson', NULL),
+(3, 'Legume', NULL),
+(4, 'Epice', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `menu`
+--
+
+CREATE TABLE IF NOT EXISTS `menu` (
+  `idmenu` int(11) NOT NULL AUTO_INCREMENT,
+  `libelle` varchar(100) NOT NULL,
+  `description` varchar(150) NOT NULL,
+  `prix` double NOT NULL,
+  `idfamille` int(11) NOT NULL,
+  PRIMARY KEY (`idmenu`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+
+--
+-- Contenu de la table `menu`
+--
+
+INSERT INTO `menu` (`idmenu`, `libelle`, `description`, `prix`, `idfamille`) VALUES
+(5, 'Pistolet pannE', 'pistolet', 3500, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `menu_article`
+--
+
+CREATE TABLE IF NOT EXISTS `menu_article` (
+  `idmenu` int(11) NOT NULL,
+  `idarticle` int(11) NOT NULL,
+  `quantite` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Contenu de la table `menu_article`
+--
+
+INSERT INTO `menu_article` (`idmenu`, `idarticle`, `quantite`) VALUES
+(5, 2, 0.3);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `menu_famille`
+--
+
+CREATE TABLE IF NOT EXISTS `menu_famille` (
+  `idfamille` int(11) NOT NULL AUTO_INCREMENT,
+  `libelle` varchar(100) NOT NULL,
+  `description` varchar(150) DEFAULT NULL,
+  PRIMARY KEY (`idfamille`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+
+--
+-- Contenu de la table `menu_famille`
+--
+
+INSERT INTO `menu_famille` (`idfamille`, `libelle`, `description`) VALUES
+(1, 'Soupe', ''),
+(2, 'Dessert', ''),
+(3, 'Entrée', ''),
+(4, 'Snack', '');
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `menu_libelle`
+--
+CREATE TABLE IF NOT EXISTS `menu_libelle` (
+`idmenu` int(11)
+,`libelle` varchar(100)
+,`description` varchar(150)
+,`prix` double
+,`idfamille` int(11)
+,`famille` varchar(100)
+);
 -- --------------------------------------------------------
 
 --
@@ -58,7 +196,6 @@ CREATE TABLE IF NOT EXISTS `roleactivite` (
 
 INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'stat'),
-(1, 'menu/categorie-saisie'),
 (1, 'configuration/liste-utilisateur'),
 (2, 'stat'),
 (2, 'menu/categorie-saisie'),
@@ -80,7 +217,55 @@ INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'configuration/table-ajout'),
 (2, 'configuration/table-ajout'),
 (1, 'table-ajout'),
-(2, 'table-ajout');
+(2, 'table-ajout'),
+(1, 'table-occuper'),
+(2, 'table-occuper'),
+(1, 'table-liberer'),
+(2, 'table-liberer'),
+(1, 'table-transferer'),
+(2, 'table-transferer'),
+(1, 'configuration/famille-liste'),
+(2, 'configuration/famille-liste'),
+(1, 'configuration/famille-ajout'),
+(2, 'configuration/famille-ajout'),
+(1, 'configuration/famille-modif'),
+(2, 'configuration/famille-modif'),
+(1, 'crud-insert'),
+(2, 'crud-insert'),
+(1, 'crud-update'),
+(2, 'crud-update'),
+(1, 'crud-delete'),
+(2, 'crud-delete'),
+(1, 'configuration/categorie-liste'),
+(2, 'configuration/categorie-liste'),
+(1, 'configuration/categorie-ajout'),
+(2, 'configuration/categorie-ajout'),
+(1, 'configuration/categorie-modif'),
+(2, 'configuration/categorie-modif'),
+(1, 'configuration/unite-liste'),
+(2, 'configuration/unite-liste'),
+(1, 'configuration/unite-ajout'),
+(2, 'configuration/unite-ajout'),
+(1, 'configuration/unite-modif'),
+(2, 'configuration/unite-modif'),
+(1, 'configuration/article-ajout'),
+(2, 'configuration/article-ajout'),
+(1, 'configuration/article-modif'),
+(2, 'configuration/article-modif'),
+(1, 'configuration/article-fiche'),
+(2, 'configuration/article-fiche'),
+(1, 'configuration/article-liste'),
+(2, 'configuration/article-liste'),
+(1, 'configuration/menu-ajout'),
+(2, 'configuration/menu-ajout'),
+(1, 'configuration/menu-modif'),
+(2, 'configuration/menu-modif'),
+(1, 'configuration/menu-liste'),
+(2, 'configuration/menu-liste'),
+(1, 'menu-ajout'),
+(2, 'menu-ajout'),
+(1, 'menu-modif'),
+(2, 'menu-modif');
 
 -- --------------------------------------------------------
 
@@ -96,17 +281,41 @@ CREATE TABLE IF NOT EXISTS `table_liste` (
   `etat` int(11) NOT NULL,
   `place` int(11) NOT NULL,
   PRIMARY KEY (`idtable`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
 
 --
 -- Contenu de la table `table_liste`
 --
 
 INSERT INTO `table_liste` (`idtable`, `nom`, `positionx`, `positiony`, `etat`, `place`) VALUES
-(1, 'T1', 309, 46, 1, 4),
-(2, 'T2', 50, 27, 2, 4),
-(3, 'T3', 46, 132, 3, 6),
-(4, 'T4', 269, 141, 4, 4);
+(1, 'T1', 385, 203, 1, 4),
+(2, 'T2', 303, 94, 2, 4),
+(3, 'T3', 97, 205, 3, 6),
+(4, 'T4', 472, 186, 4, 4),
+(6, 'T5', 216, 189, 1, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `unite_article`
+--
+
+CREATE TABLE IF NOT EXISTS `unite_article` (
+  `idunite` int(11) NOT NULL AUTO_INCREMENT,
+  `libelle` varchar(100) NOT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`idunite`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+
+--
+-- Contenu de la table `unite_article`
+--
+
+INSERT INTO `unite_article` (`idunite`, `libelle`, `description`) VALUES
+(1, 'Kg', 'Kilo gramme'),
+(2, 'Litre', 'Litre'),
+(3, 'Gramme', NULL),
+(4, 'Piece', NULL);
 
 -- --------------------------------------------------------
 
@@ -123,7 +332,7 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `idrole` int(11) NOT NULL,
   `active` int(11) NOT NULL,
   PRIMARY KEY (`idutilisateur`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
 --
 -- Contenu de la table `utilisateur`
@@ -133,7 +342,8 @@ INSERT INTO `utilisateur` (`idutilisateur`, `nom`, `prenom`, `login`, `passe`, `
 (1, 'vonjy', 'vonjy', 'vonjy', 'nw6KzVSMEfayNp8BpNH7lQ==', 1, 1),
 (2, 'test', 'test', 'test', '5RV2UXq8iOlROXgqefVjrg==', 2, 1),
 (3, 'johan', 'johan', 'johan', 'wYwDOV7IT8/0SUmB4m4Rfg==', 1, 1),
-(4, 'rova', 'rova', 'rova', 'xjbdZIpNi+IZQaI14vsWEQ==', 1, 1);
+(4, 'rova', 'rova', 'rova', 'xjbdZIpNi+IZQaI14vsWEQ==', 1, 1),
+(5, 'test1', 'test1', 'test1', '0nWOk6N5sIhe27h+zm4QCg==', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -153,6 +363,24 @@ CREATE TABLE IF NOT EXISTS `utilisateur_libelle` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la vue `article_stock_libelle`
+--
+DROP TABLE IF EXISTS `article_stock_libelle`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `article_stock_libelle` AS select `article`.`idarticle` AS `idarticle`,`article`.`libelle` AS `libelle`,`article`.`description` AS `description`,`article`.`idcategorie` AS `idcategorie`,`article`.`quantite` AS `quantite`,`article`.`idunite` AS `idunite`,`cat`.`libelle` AS `categorie`,`unite`.`libelle` AS `unite` from ((`article_stock` `article` left join `categorie_article` `cat` on((`cat`.`idcategorie` = `article`.`idcategorie`))) left join `unite_article` `unite` on((`unite`.`idunite` = `article`.`idunite`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `menu_libelle`
+--
+DROP TABLE IF EXISTS `menu_libelle`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `menu_libelle` AS select `menu`.`idmenu` AS `idmenu`,`menu`.`libelle` AS `libelle`,`menu`.`description` AS `description`,`menu`.`prix` AS `prix`,`menu`.`idfamille` AS `idfamille`,`famille`.`libelle` AS `famille` from (`menu` left join `menu_famille` `famille` on((`famille`.`idfamille` = `menu`.`idfamille`)));
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la vue `utilisateur_libelle`
 --
 DROP TABLE IF EXISTS `utilisateur_libelle`;
@@ -162,4 +390,3 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-

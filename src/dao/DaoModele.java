@@ -307,7 +307,7 @@ public class DaoModele {
     	}
     	
     }
-    public void save(List<DataEntity> data, Connection con) throws Exception
+    public <T extends DataEntity> void save(List<T> data, Connection con) throws Exception
 	{
 		PreparedStatement pst=null;
 
@@ -321,10 +321,6 @@ public class DaoModele {
 			int indiceStat=1;
 			Field[] champs=data.get(0).getAllFields();
 			for(int ii=0;ii<data.size();ii++){
-				if(!data.get(ii).isValide())
-				{
-					throw new Exception("erreur");
-				}
 				for(int i=0; i<champs.length;i++)
 				{
 					if(isExisteChamp(data.get(0).getReferenceForField(champs[i]),data.get(0).findReference(),con)==false)continue;
@@ -348,6 +344,8 @@ public class DaoModele {
 						val=(inter!=null) ? new java.sql.Date(((java.util.Date) inter).getTime()) : null ;
 					}
 					else val=m.invoke(data.get(ii), null);
+					if(val==null && champs[i].getType().equals(String.class))
+						val="";
 					pst.setObject(indiceStat, val);
 					indiceStat++;
 				}
@@ -356,10 +354,9 @@ public class DaoModele {
 				try(ResultSet generatedKey=pst.getGeneratedKeys()){
 					if(generatedKey.next()){
 						try{
-							data.get(ii).getClass().getMethod("set"+setMaj(data.get(0).getPkName()), int.class).invoke(data.get(ii), generatedKey.getInt(data.get(0).getPkName()));
+							data.get(ii).getClass().getMethod("set"+setMaj(data.get(0).getPkName()), int.class).invoke(data.get(ii), generatedKey.getInt(1));
 						}
 						catch(Exception ex){
-							
 						}
 						
 					}
@@ -454,6 +451,8 @@ public class DaoModele {
 		return objet.findReference()+" WHERE "+getCondition(objet,conn,apresWhere);
 	}
 	public <T extends DataEntity> void update(List<T> liste,Connection conn,String apresWhere)throws Exception{
+		if(liste.size()==0)
+			throw new Exception("Liste vide");
 		String[]col=colModif(liste.get(0));
 		String query=getRequetteModif(liste.get(0),col);
 		if(apresWhere!=null)
@@ -463,10 +462,6 @@ public class DaoModele {
 		boolean isValable=false;
 		int comptset=1;
 		for(int ii=0;ii<liste.size();ii++){
-			if(!liste.get(ii).isValide())
-			{
-				throw new Exception("erreur");
-			}
 			for(String s:col){
 				if(s!=null){
 					Object valeur=null;
@@ -480,6 +475,8 @@ public class DaoModele {
 					if(valeur!= null && valeur.getClass().equals(java.util.Date.class))
 						prstat.setObject(comptset, new java.sql.Date(((java.util.Date)valeur).getTime()));
 					else {
+						if(valeur==null && liste.get(0).getFieldByName(s).getType().equals(String.class))
+							valeur="";
 						prstat.setObject(comptset, valeur);
 					}
 					comptset++;

@@ -33,7 +33,8 @@
 			%>
 			tables[<%=i %>]=new Table(<%=data.get(i).getPositionx() %>, <%=data.get(i).getPositiony() %>, 40,'<%=data.get(i).getNom() %>',<%=data.get(i).getIdtable() %>,false,<%=data.get(i).getEtat() %>);
 		<%}%>
-		tables[<%=taille%>]=new Table(250, 75, 40,'NV',-1,true,0);
+		var tableNouveau=new Table(250, 75, 40,'NV',-1,true,0);
+		tables[<%=taille%>]=tableNouveau;
 		initGestionTable("tableEmpl",tables,false,true,true,function(selected,xval,yval){
 			if(selected.id==-1){
 				$("#positionx").val(xval);

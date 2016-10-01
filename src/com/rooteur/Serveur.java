@@ -106,7 +106,7 @@ public class Serveur {
 		
 	}
 	public static void back(HttpServletRequest request, HttpServletResponse response,String errer) throws IOException{
-		response.getWriter().write("<html><body><script>alert('"+errer+"');history.back();</script></body></html>");
+		response.getWriter().write("<html><body><script>alert('"+((errer!=null) ? errer.replace("'", " ") : "Erreur au niveau serveur")+"');history.back();</script></body></html>");
 	}
 
 }

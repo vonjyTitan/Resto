@@ -30,12 +30,12 @@ public class CrudAction extends Action {
 		entity=new HTMLBuilder(entity, request).getEntity();
 		if(!entity.isValide())
 		{
-			goTo(request,response,request.getHeader("Referer")+"?erreur=Champ invalide");
-			throw new Exception("Champ manquant");
+			goTo(request,response,SessionUtil.getValForAttr(request, "refereur")+"&erreur=Champ invalide");
+			return;
 		}
 		DaoModele.getInstance().save(entity);
 		String cible=SessionUtil.getValForAttr(request, "cible");
-		goTo(request,response,"main.jsp?cible="+cible);
+		goTo(request,response,"get","main.jsp?cible="+cible);
 	}
 	public void update(HttpServletRequest request,HttpServletResponse response)throws Exception{
 		String classe=SessionUtil.getValForAttr(request, "classenom");
@@ -54,7 +54,8 @@ public class CrudAction extends Action {
 		entity=new HTMLBuilder(entity, request).getEntity();
 		if(!entity.isValide())
 		{
-			goTo(request,response,request.getHeader("Referer")+"?erreur=Champ invalide");
+			goTo(request,response,SessionUtil.getValForAttr(request, "refereur")+"&erreur=Champ invalide");
+			return;
 		}
 		if(DaoModele.getInstance().findById(entity)==null)
 		{
@@ -62,7 +63,7 @@ public class CrudAction extends Action {
 		}
 		DaoModele.getInstance().update(entity);
 		String cible=SessionUtil.getValForAttr(request, "cible");
-		goTo(request,response,"main.jsp?cible="+cible);
+		goTo(request,response,"get","main.jsp?cible="+cible);
 	}
 	public void delete(HttpServletRequest request,HttpServletResponse response)throws Exception{
 		String classe=SessionUtil.getValForAttr(request, "classenom");
@@ -78,13 +79,13 @@ public class CrudAction extends Action {
 		catch(Exception ex){
 			throw new Exception("La class doit heritE de la class DataEntity!");
 		}
-		entity.setValueForField(entity.getFieldByName(entity.getPkName()), SessionUtil.getValForAttr(request, "id"));
+		entity.setValueForField(entity.getFieldByName(entity.getPkName()),Integer.valueOf((String)SessionUtil.getValForAttr(request, "id")));
 		if(DaoModele.getInstance().findById(entity)==null)
 		{
 			throw new Exception("Objet introuvable");
 		}
 		DaoModele.getInstance().delete(entity);
 		String cible=SessionUtil.getValForAttr(request, "cible");
-		goTo(request,response,"main.jsp?cible="+cible);
+		goTo(request,response,"get","main.jsp?cible="+cible);
 	}
 }

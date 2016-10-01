@@ -21,6 +21,6 @@
 	builder.setLienForId("main.jsp?cible=configuration/utilisateur-fiche");
 %>
 <%=builder.getFilterBuilder().getHTML()%>
-<%=HTMLBuilder.beginPanel("liste informations",12) %>
+<%=HTMLBuilder.beginPanel("liste informations",12,"") %>
 <%=builder.getHTML()%>
 <%=HTMLBuilder.endPanel() %>

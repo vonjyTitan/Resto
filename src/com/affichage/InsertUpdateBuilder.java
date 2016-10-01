@@ -32,7 +32,7 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 		
 	}
 	
-	public String beginHTMLForm()throws Exception{
+	public String beginHTMLForm(boolean withFile)throws Exception{
 		try{
 			if(SessionUtil.getValForAttr(request, "erreur")!=null){
 				entity.isValide();
@@ -48,7 +48,7 @@ public class InsertUpdateBuilder<T extends DataEntity> extends FormBuilder<T> {
 		}		
 		 reponse+="<div class=\"row mt\">"
 		 	+"<div class=\"col-lg-12\">";
-		reponse+= "<form action=\""+cible+"\" method=\"POST\" name=\""+getEntity().getClass().getSimpleName().toLowerCase().toLowerCase()+"form\" id=\""+getEntity().getClass().getSimpleName().toLowerCase()+"form\" class=\""+classForForm+"\">";
+		reponse+= "<form action=\""+cible+"\" method=\"POST\" name=\""+getEntity().getClass().getSimpleName().toLowerCase().toLowerCase()+"form\" id=\""+getEntity().getClass().getSimpleName().toLowerCase()+"form\" class=\""+classForForm+"\" "+((withFile) ? "enctype=\"multipart/form-data\"" : "" )+ ">";
 		try{
 			if(getEntity().findFormError()!=null){
 				if(showErrorMode==ERROR_SHOW.POP_UP){

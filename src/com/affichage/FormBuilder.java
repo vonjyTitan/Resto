@@ -27,7 +27,7 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	private String defaultClassForSelect="form-control col-lg-6";
 	protected String defaultClassForContainer="form-group col-lg-12";
 	protected String classForValidation="btn btn-primary";
-	private String defaultClassForError="alert alert-warning";
+	private String defaultClassForError="danger";
 	protected String classForReset="btn btn-danger";
 	private String defaultClassForInputContainer="col-sm-7";
 	private Map<Champ,List<OptionObject>> typeSelectGenerique;
@@ -50,11 +50,14 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		return getHTML(12);
 	}
 	public String beginHTMLForm()throws Exception{
+		return beginHTMLForm(false);
+	}
+	public String beginHTMLForm(boolean withFile) throws Exception{
 		String reponse="";	
 		 /*reponse+="<div class=\"row mt\">"
 		 	+"<div class=\"col-lg-12\">";*/
 		String lien=request.getRequestURI()+"?cible="+request.getParameter("cible");
-		reponse+= "<form action=\""+lien+"\" method=\"POST\" name=\""+getEntity().getClass().getSimpleName().toLowerCase().toLowerCase()+"form\" id=\""+getEntity().getClass().getSimpleName().toLowerCase()+"form\" class=\""+classForForm+"\">";
+		reponse+= "<form action=\""+lien+"\" method=\"POST\" name=\""+getEntity().getClass().getSimpleName().toLowerCase().toLowerCase()+"form\" id=\""+getEntity().getClass().getSimpleName().toLowerCase()+"form\" "+((withFile) ? "enctype=\"multipart/form-data\"" : "" )+" class=\""+classForForm+"\">";
 		return reponse;
 	}
 	public String getHTMLBody() throws Exception{
@@ -63,7 +66,8 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 			conn=Connecteur.getConnection(entity.findDataBaseKey());
 			String reponse="";
 			for(Champ f:fieldsAvalaible){
-				if(!DaoModele.getInstance().isExisteChamp(entity.getReferenceForField(f.getField()), entity.findReference(), conn))
+				
+				if(f.getField()!=null && !DaoModele.getInstance().isExisteChamp(entity.getReferenceForField(f.getField()), entity.findReference(), conn))
 					continue;
 				reponse+=blockFor(f,false); 
 			}
@@ -103,6 +107,10 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 	public String endHTMLForm(){
 		String reponse="";
 		reponse+="</form>";
+		reponse+="<style> .danger{ text-color: red !important; "
+				+ "}"
+				+ ".danger input{"
+				+ "border : 1px solid #da2727 !important;}</style>";
 		/*reponse+="</div>";
 		reponse+="</div>";*/
 		return reponse;
@@ -189,13 +197,18 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		String reponse="";
 		reponse+=select;
 		if(select.length()==0){
-			reponse+=getTypeForField(field)+" name=\""+field.getName()+"\" id=\""+field.getName()+"\" value=\""+defaultValudeForField(field)+"\" class=\""+classe+"\" "+add+">";
+			reponse+=getTypeForField(field)+" name=\""+field.getName()+"\" id=\""+field.getName()+"\"  class=\""+classe+"\" "+add+" "+getEndInput(field,defaultValudeForField(field));
 		}
 		return reponse;
 	}
+	private String getEndInput(Champ field,Object value){
+		if(field.isTextarea())
+			return ">"+value+"</textarea>";
+		return "value=\""+value+"\" />";
+	}
 	private String getTypeForField(Champ f)throws Exception{
 		if(getEntity().isNumberType(f.getType())){
-			return "<input type=\"number\"";
+			return "<input type=\"text\"";
 		}
 		else if(f.getType().equals(Date.class) || f.getType().equals(java.sql.Date.class))
 		{
@@ -205,6 +218,9 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 			if((boolean)defaultValudeForField(f)==true)
 				return "<input type=\"checkbox\" checked=\"checked\"";
 			return "<input type=\"checkbox\" checked=\"\"";
+		}
+		if(f.isTextarea()){
+			return "<textarea ";
 		}
 		return "<input type=\"text\"";
 	}
@@ -312,6 +328,17 @@ public class FormBuilder<T extends DataEntity> extends HTMLBuilder<T> {
 		if(field==null)
 			throw new Exception("Champ "+champ+" introuvable");
 		classForChamp.put(field, classe);
+	}
+	public void setChampTextarea(String[] champs)throws Exception
+	{
+		for(String champ:champs)
+			setChampTextarea(champ);
+	}
+	public void setChampTextarea(String champ)throws Exception{
+		Champ f=getFieldByName(champ);
+		if(f==null)
+			throw new Exception("Champ "+champ+" introuvable");
+		f.setTextarea(true);
 	}
 	public String getDefauldClassForLabel() {
 		return defauldClassForLabel;
