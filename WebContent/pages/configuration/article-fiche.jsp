@@ -8,8 +8,10 @@
 
 <jsp:include page='../verificateur.jsp'/>
 <%
-	PageFiche builder=new PageFiche(new ArticleStock(),request);
-	builder.removeChamp("idarticle");
+	ArticleStock critArticle=new ArticleStock();
+	critArticle.setNomTable("article_stock_libelle");
+	PageFiche builder=new PageFiche(critArticle,request);
+	builder.removeChamp(new String[]{"idarticle","idunite","idcategorie"});
 	builder.getFieldByName("quantite").setMethodForChamp("findQuantite");
 %>
 <h3><a href="main.jsp?cible=configuration/article-liste"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Fiche article</h3>

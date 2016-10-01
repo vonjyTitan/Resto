@@ -2,6 +2,7 @@ package com.mapping;
 
 import com.annotations.Entity;
 import com.annotations.ForeignKey;
+import com.annotations.NumberRestrict;
 import com.annotations.Parameter;
 import com.annotations.Required;
 
@@ -12,6 +13,8 @@ public class Menu extends DataEntity {
 	private String libelle;
 	private String description;
 	@Required
+	@Parameter(libelle="Prix (Ariary)")
+	@NumberRestrict(min=200.0)
 	private double prix;
 	@Parameter(libelle="Famille")
 	@ForeignKey(toclasse=MenuFamille.class,libtable="libelle",pktable="idfamille")

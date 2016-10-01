@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Lun 26 Septembre 2016 à 18:26
+-- Généré le: Sam 01 Octobre 2016 à 06:44
 -- Version du serveur: 5.5.24-log
 -- Version de PHP: 5.3.13
 
@@ -46,6 +46,21 @@ INSERT INTO `article_stock` (`idarticle`, `libelle`, `description`, `idcategorie
 -- --------------------------------------------------------
 
 --
+-- Doublure de structure pour la vue `article_stock_libelle`
+--
+CREATE TABLE IF NOT EXISTS `article_stock_libelle` (
+`idarticle` int(11)
+,`libelle` varchar(100)
+,`description` varchar(100)
+,`idcategorie` int(11)
+,`quantite` int(11)
+,`idunite` int(11)
+,`categorie` varchar(100)
+,`unite` varchar(100)
+);
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `categorie_article`
 --
 
@@ -54,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `categorie_article` (
   `libelle` varchar(100) NOT NULL,
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`idcategorie`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
 -- Contenu de la table `categorie_article`
@@ -79,7 +94,33 @@ CREATE TABLE IF NOT EXISTS `menu` (
   `prix` double NOT NULL,
   `idfamille` int(11) NOT NULL,
   PRIMARY KEY (`idmenu`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+
+--
+-- Contenu de la table `menu`
+--
+
+INSERT INTO `menu` (`idmenu`, `libelle`, `description`, `prix`, `idfamille`) VALUES
+(5, 'Pistolet pannE', 'pistolet', 3500, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `menu_article`
+--
+
+CREATE TABLE IF NOT EXISTS `menu_article` (
+  `idmenu` int(11) NOT NULL,
+  `idarticle` int(11) NOT NULL,
+  `quantite` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Contenu de la table `menu_article`
+--
+
+INSERT INTO `menu_article` (`idmenu`, `idarticle`, `quantite`) VALUES
+(5, 2, 0.3);
 
 -- --------------------------------------------------------
 
@@ -104,6 +145,19 @@ INSERT INTO `menu_famille` (`idfamille`, `libelle`, `description`) VALUES
 (3, 'Entrée', ''),
 (4, 'Snack', '');
 
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `menu_libelle`
+--
+CREATE TABLE IF NOT EXISTS `menu_libelle` (
+`idmenu` int(11)
+,`libelle` varchar(100)
+,`description` varchar(150)
+,`prix` double
+,`idfamille` int(11)
+,`famille` varchar(100)
+);
 -- --------------------------------------------------------
 
 --
@@ -201,7 +255,17 @@ INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'configuration/article-fiche'),
 (2, 'configuration/article-fiche'),
 (1, 'configuration/article-liste'),
-(2, 'configuration/article-liste');
+(2, 'configuration/article-liste'),
+(1, 'configuration/menu-ajout'),
+(2, 'configuration/menu-ajout'),
+(1, 'configuration/menu-modif'),
+(2, 'configuration/menu-modif'),
+(1, 'configuration/menu-liste'),
+(2, 'configuration/menu-liste'),
+(1, 'menu-ajout'),
+(2, 'menu-ajout'),
+(1, 'menu-modif'),
+(2, 'menu-modif');
 
 -- --------------------------------------------------------
 
@@ -241,7 +305,7 @@ CREATE TABLE IF NOT EXISTS `unite_article` (
   `libelle` varchar(100) NOT NULL,
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`idunite`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
 -- Contenu de la table `unite_article`
@@ -296,6 +360,24 @@ CREATE TABLE IF NOT EXISTS `utilisateur_libelle` (
 ,`active` int(11)
 ,`role` varchar(50)
 );
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `article_stock_libelle`
+--
+DROP TABLE IF EXISTS `article_stock_libelle`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `article_stock_libelle` AS select `article`.`idarticle` AS `idarticle`,`article`.`libelle` AS `libelle`,`article`.`description` AS `description`,`article`.`idcategorie` AS `idcategorie`,`article`.`quantite` AS `quantite`,`article`.`idunite` AS `idunite`,`cat`.`libelle` AS `categorie`,`unite`.`libelle` AS `unite` from ((`article_stock` `article` left join `categorie_article` `cat` on((`cat`.`idcategorie` = `article`.`idcategorie`))) left join `unite_article` `unite` on((`unite`.`idunite` = `article`.`idunite`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `menu_libelle`
+--
+DROP TABLE IF EXISTS `menu_libelle`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `menu_libelle` AS select `menu`.`idmenu` AS `idmenu`,`menu`.`libelle` AS `libelle`,`menu`.`description` AS `description`,`menu`.`prix` AS `prix`,`menu`.`idfamille` AS `idfamille`,`famille`.`libelle` AS `famille` from (`menu` left join `menu_famille` `famille` on((`famille`.`idfamille` = `menu`.`idfamille`)));
+
 -- --------------------------------------------------------
 
 --

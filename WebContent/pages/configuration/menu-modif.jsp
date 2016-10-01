@@ -9,7 +9,8 @@
 <jsp:include page='../verificateur.jsp'/>
 <script src="assets/js/jquery.min.js"></script>
 <%
-	InsertUpdateBuilder builder=new InsertUpdateBuilder(new Menu(),"menu-ajout",request);
+	InsertUpdateBuilder builder=new InsertUpdateBuilder(new Menu(),"menu-modif",request);
+	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
 	builder.removeChamp("idmenu");
 	builder.setChampTextarea("description");
 	ArticleStock critArticle=new ArticleStock();
@@ -17,9 +18,20 @@
 	List<ArticleStock> articles=DaoModele.getInstance().findPageGenerique(1, critArticle);
 	String[] articlesRet=request.getParameterValues("article");
 	String[] quantes=request.getParameterValues("quantite");
+	if(articlesRet==null){
+		List<MenuArticle> ma=DaoModele.getInstance().findPageGenerique(1, new MenuArticle()," and idmenu="+SessionUtil.getValForAttr(request, "id"));
+		int taille=ma.size();
+		articlesRet=new String[taille];
+		quantes=new String[taille];
+		for(int i=0;i<taille;i++){
+			articlesRet[i]=String.valueOf(ma.get(i).getIdarticle());
+			quantes[i]=String.valueOf(ma.get(i).getQuantite());
+		}
+	}
+	
 %>
 <div class="col-lg-12" ng-app="myApp" ng-controller="myCtrl">
-<h3>Ajout nouveau menu</h3>
+<h3>Modification menu</h3>
 <%=builder.beginHTMLForm()%>
 <%=HTMLBuilder.beginPanel("Informations", 6) %>
 <%=builder.getHTMLBody() %>

@@ -8,7 +8,10 @@
 
 <jsp:include page='../verificateur.jsp'/>
 <%
-	TableBuilder builder=new TableBuilder(new ArticleStock(),request);
+	ArticleStock critArticle=new ArticleStock();
+	critArticle.setNomTable("article_stock_libelle");
+	TableBuilder builder=new TableBuilder(critArticle,request);
+	builder.removeChamp(new String[]{"idcategorie","idunite"});
 	builder.getFilterBuilder().setChampToInterval("quantite");
 	builder.getFilterBuilder().removeChamp("idunite");
 	builder.getFieldByName("quantite").setMethodForChamp("findQuantite");

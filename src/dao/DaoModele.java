@@ -307,7 +307,7 @@ public class DaoModele {
     	}
     	
     }
-    public void save(List<DataEntity> data, Connection con) throws Exception
+    public <T extends DataEntity> void save(List<T> data, Connection con) throws Exception
 	{
 		PreparedStatement pst=null;
 
@@ -354,10 +354,9 @@ public class DaoModele {
 				try(ResultSet generatedKey=pst.getGeneratedKeys()){
 					if(generatedKey.next()){
 						try{
-							data.get(ii).getClass().getMethod("set"+setMaj(data.get(0).getPkName()), int.class).invoke(data.get(ii), generatedKey.getInt(data.get(0).getPkName()));
+							data.get(ii).getClass().getMethod("set"+setMaj(data.get(0).getPkName()), int.class).invoke(data.get(ii), generatedKey.getInt(1));
 						}
 						catch(Exception ex){
-							
 						}
 						
 					}

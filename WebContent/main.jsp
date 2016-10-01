@@ -227,7 +227,7 @@ try{
               <!-- sidebar menu start-->
               <ul class="sidebar-menu" id="nav-accordion">
               
-              	  <p class="centered"><a href="profile.html"><img src="assets/img/icon2.png" class="img-circle" width="60"></a></p>
+              	  <!-- <p class="centered"><a href="profile.html"><img src="assets/img/icon2.png" class="img-circle" width="60"></a></p>-->
               	  <h5 class="centered"><%=((Utilisateur)request.getSession().getAttribute("utilisateur")).getNom()%></h5>
                   <li class="mt">
                       <a class="active" id="menu-ecceuil" href="main.jsp?cible=stat&currmenu=menu-ecceuil" >
