@@ -390,3 +390,20 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE IF NOT EXISTS `menu_article_libelle` (
+`menu` varchar(100)
+,`article` varchar(100)
+,`unite` varchar(100)
+,`quantite` double
+,`idarticle` int(11)
+,`idmenu` int(11)
+);
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `menu_article_libelle`
+--
+DROP TABLE IF EXISTS `menu_article_libelle`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `menu_article_libelle` AS select `menu`.`libelle` AS `menu`,`article`.`libelle` AS `article`,`article`.`unite` AS `unite`,`ma`.`quantite` AS `quantite`,`ma`.`idarticle` AS `idarticle`,`ma`.`idmenu` AS `idmenu` from ((`menu_article` `ma` join `menu` on((`ma`.`idmenu` = `menu`.`idmenu`))) left join `article_stock_libelle` `article` on((`article`.`idarticle` = `ma`.`idarticle`)));

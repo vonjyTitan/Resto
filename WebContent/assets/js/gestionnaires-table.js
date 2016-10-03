@@ -89,8 +89,8 @@ moovemodeVal,onMouseUpVal)
 function tableInpoint(valx,valy){
 	for(var i=0; i < tableArray.length; i++) {
       var table = tableArray[i];
-      if(!table.drawable)
-    	  continue;
+     /* if(!table.drawable)
+    	  continue;*/
 	var IsInCity=table.isClicked(valx,valy);
 	if(IsInCity){
 		return table;

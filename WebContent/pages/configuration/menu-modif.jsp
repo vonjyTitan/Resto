@@ -11,7 +11,7 @@
 <%
 	InsertUpdateBuilder builder=new InsertUpdateBuilder(new Menu(),"menu-modif",request);
 	builder.setValueFromDatabase(SessionUtil.getValForAttr(request, "id"));
-	builder.removeChamp("idmenu");
+	builder.addNotVisibleChamp("idmenu");
 	builder.setChampTextarea("description");
 	ArticleStock critArticle=new ArticleStock();
 	critArticle.setNomTable("article_stock_libelle");
