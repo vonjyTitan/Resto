@@ -459,3 +459,23 @@ CREATE TABLE IF NOT EXISTS `menu_commande` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 ALTER TABLE `commande` CHANGE `daty` `daty` DATETIME NOT NULL;
+
+create or replace view ensemble_commande
+as 
+select 
+cet.idensemble,
+max(DATE(com.daty) as daty,
+group_concat(cet.idtable) as idtable,
+group_concat(table_liste.nom) as table_liste,
+sum(com.nombre_client) as client,
+group_concat(com.idcommande) as idcommande
+from 
+commande as com
+join 
+commande_ensemble_table
+as cet
+on cet.idensemble=com.idensemble
+left join 
+table_liste on table_liste.idtable=cet.idtable
+group by cet.idensemble
+order by daty desc;
