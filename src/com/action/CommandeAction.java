@@ -1,16 +1,24 @@
 package com.action;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mapping.Commande;
 import com.mapping.ConstantEtat;
+import com.mapping.MenuCommande;
+import com.mapping.OptionObject;
 import com.mapping.Table;
 import com.rooteur.Action;
 
 import dao.Connecteur;
 import dao.DaoModele;
+import utilitaire.UtileAffichage;
+import utilitaire.Utilitaire;
 
 public class CommandeAction extends Action {
 	public void ajout(HttpServletRequest request,HttpServletResponse response)throws Exception{
@@ -35,8 +43,46 @@ public class CommandeAction extends Action {
 		try{
 			conn=Connecteur.getConnection();
 			conn.setAutoCommit(false);
+			int idEnsemble=0;
+			Commande comm=new Commande();
+			List<java.util.Map<String, Object>> rep=DaoModele.getInstance().excecuteQuery("select case when max(idensemble) is null then 0 else max(idensemble)  end as idensemble from commande", conn);
+			if(rep.size()==0)
+				throw new Exception("Problem au niveau serveur");
+			idEnsemble=(int) rep.get(0).get("idensemble") + 1;
 			
+			comm.setIdensemble(idEnsemble);
+			comm.setLastensemble(idEnsemble);
+			comm.setNbPersonnes(client);
+			comm.setDaty(new java.sql.Date(UtileAffichage.getDateNow().getTime()));
+			DaoModele.getInstance().save(comm, conn);
+			
+			MenuCommande mc=null;
+			int taille=menus.length;
+			List<MenuCommande> mcs=new ArrayList<MenuCommande>(taille);
+			for(int i=0;i<taille;i++){
+				mc=new MenuCommande();
+				mc.setRemarque(remarque[i]);
+				mc.setIdmenu(Integer.valueOf("0"+menus[i]));
+				mc.setIdcommande(comm.getIdcommande());
+				mc.setQuantite(Integer.valueOf("0"+quantite[i]));
+				mcs.add(mc);
+			}
+			DaoModele.getInstance().save(mcs, conn);
+			
+			
+			OptionObject ob=new OptionObject();
+			ob.setReferenceForField("idint", "idensemblt");
+			ob.setReferenceForField("valint", "idtable");
+			ob.setIdint(idEnsemble);
+			ob.setValint(t.getIdtable());
+			ob.setNomTable("commande_ensemble_table");
+			
+			DaoModele.getInstance().save(ob, conn);
+			
+			t.setEtat(ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE);
+			DaoModele.getInstance().update(t, conn);
 			conn.commit();
+			goTo(request, response , "get","main.jsp?cible=commande/commande-liste&idensemble="+idEnsemble+"&idcommande="+comm.getIdcommande());
 		}
 		catch(Exception ex){
 			if(conn!=null)

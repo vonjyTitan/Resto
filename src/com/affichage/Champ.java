@@ -26,6 +26,8 @@ public class Champ {
 	private DataEntity entity=null;
 	private ForeignKey fk=null;
 	private boolean isTextarea=false;
+	private String lien=null;
+	private String lienParamVal=null;
 	
 	public ForeignKey getFk() {
 		return fk;
@@ -137,5 +139,18 @@ public class Champ {
 	}
 	public void setTextarea(boolean isTextarea) {
 		this.isTextarea = isTextarea;
+	}
+	public String getLien() {
+		return lien;
+	}
+	public void setLien(String lien, String paramVal) {
+		this.lien = lien;
+		setLienParamVal(paramVal);
+	}
+	public String getLienParamVal() {
+		return lienParamVal;
+	}
+	public void setLienParamVal(String lienParamVal) {
+		this.lienParamVal = lienParamVal;
 	}
 }

@@ -397,7 +397,7 @@ public class DaoModele {
 			}
 			index=true;
 			
-			champs=champs+fields[i].getName().toString();
+			champs=champs+bm.getReferenceForField(fields[i]);
 			valeurs=valeurs+"?";
 			
 			

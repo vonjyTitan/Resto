@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts2.rest.HttpHeaders;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mapping.Notification;
 
 public class Action {
@@ -18,7 +22,14 @@ public class Action {
 			if(nomMethod.isEmpty())
 				throw new Exception("Action introuvable");
 			Method met=this.getClass().getMethod(nomMethod, new Class[]{HttpServletRequest.class,HttpServletResponse.class});
-			met.invoke(this, new Object[]{request,response});
+			Object res=met.invoke(this, new Object[]{request,response});
+			if(res!=null){
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+				Gson gs=new Gson();
+				gs.toJson(res);
+				response.getWriter().println(gs.toString());
+			}
 		}
 		catch(MethodNotFoundException ex){
 			Serveur.back(request, response,"Action introuvable");

@@ -33,9 +33,11 @@ public class PageFiche extends HTMLBuilder<DataEntity> {
 					if(isNotVisible(field))
 						continue;
 					Object value=field.getMethodForChamp().invoke(entity, null);
+					Object lastVal=UtileAffichage.getNonNullValue(value,field.getField().getType());
+					String withLien=getLien(value,field);
 					reponse+="<div class=\"form-group col-lg-12\">"
 							+"<p class=\"col-lg-6\">"+field.getLibelle()+" : </p>";
-					reponse+="<p class=\"col-lg-6\">"+UtileAffichage.getNonNullValue(value,field.getField().getType())+"</p>";
+					reponse+="<p class=\"col-lg-6\">"+withLien+"</p>";
 					reponse+="</div>";
 				}
 				
@@ -50,6 +52,16 @@ public class PageFiche extends HTMLBuilder<DataEntity> {
 				conn.close();
 		}		
 	}
+	String getLien(Object val,Champ champ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		if(champ.getLien()!=null && !champ.getLien().isEmpty()){
+			Object paramVal=val;
+			if(champ.getLienParamVal().compareToIgnoreCase(champ.getName())!=0){
+				paramVal=getFieldByName(champ.getLienParamVal()).getMethodForChamp().invoke(entity, null);
+			}
+			return "<a href=\""+champ.getLien()+paramVal+"\">"+val+"</a>";
+		}
+		return ""+val;
+	}
 	public String getHTML() throws Exception{
 		return getHTML("Informations general",8);
 	}
@@ -60,5 +72,25 @@ public class PageFiche extends HTMLBuilder<DataEntity> {
 		reponse+=endPanel();
 		return reponse;
 	}
-
+	public void setLienForAttr(String champ,String lien) throws Exception{
+		setLienForAttr(champ, lien,"id");
+	}
+	public void setLienForAttr(String champ,String lien,String paramName)throws Exception{
+		Champ c=getFieldByName(champ);
+		if(c==null)
+			throw new Exception("Champ "+champ+" introuvable");
+		setLienForAttr(c,lien,paramName,champ);
+	}
+	public void setLienForAttr(String champ,String lien,String paramName,String paramVal)throws Exception{
+		Champ c=getFieldByName(champ);
+		if(c==null)
+			throw new Exception("Champ "+champ+" introuvable");
+		setLienForAttr(c,lien,paramName,paramVal);
+	}
+	public void setLienForAttr(Champ champ,String lien,String paramName,String paramVal){
+		if(lien.indexOf("?")>=0)
+			champ.setLien(lien+"&"+paramName+"=",paramVal);
+		else
+			champ.setLien(lien+"?"+paramName+"=",paramVal);
+	}
 }

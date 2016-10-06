@@ -407,3 +407,53 @@ CREATE TABLE IF NOT EXISTS `menu_article_libelle` (
 DROP TABLE IF EXISTS `menu_article_libelle`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `menu_article_libelle` AS select `menu`.`libelle` AS `menu`,`article`.`libelle` AS `article`,`article`.`unite` AS `unite`,`ma`.`quantite` AS `quantite`,`ma`.`idarticle` AS `idarticle`,`ma`.`idmenu` AS `idmenu` from ((`menu_article` `ma` join `menu` on((`ma`.`idmenu` = `menu`.`idmenu`))) left join `article_stock_libelle` `article` on((`article`.`idarticle` = `ma`.`idarticle`)));
+
+
+CREATE TABLE IF NOT EXISTS `annulation_menu` (
+  `idcommande_menu` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `cause` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `commande`
+--
+
+CREATE TABLE IF NOT EXISTS `commande` (
+  `idcommande` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre_client` int(11) NOT NULL,
+  `daty` date NOT NULL,
+  `idensemble` int(11) NOT NULL,
+  `lastensemble` int(11) NOT NULL,
+  PRIMARY KEY (`idcommande`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `commande_ensemble_table`
+--
+
+CREATE TABLE IF NOT EXISTS `commande_ensemble_table` (
+  `idensemble` int(11) NOT NULL,
+  `idtable` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `menu_commande`
+--
+
+CREATE TABLE IF NOT EXISTS `menu_commande` (
+  `idcommande_menu` int(11) NOT NULL AUTO_INCREMENT,
+  `idcommande` int(11) NOT NULL,
+  `idmenu` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `remarque` varchar(100) DEFAULT NULL,
+  `annuler` int(11) NOT NULL DEFAULT '0',
+  `livrer` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`idcommande_menu`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;

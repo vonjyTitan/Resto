@@ -38,7 +38,7 @@
 			for(MenuArticle mia:ma){
 				%>
 					<tr>
-						<td><%=mia.getArticle() %></td>
+						<td><a href="main.jsp?cible=configuration/article-fiche&id=<%=mia.getIdarticle()%>"><%=mia.getArticle() %></a></td>
 						<td><%=mia.getQuantite()+" "+mia.getUnite() %></td>
 					</tr>
 				<%
