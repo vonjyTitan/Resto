@@ -457,3 +457,5 @@ CREATE TABLE IF NOT EXISTS `menu_commande` (
   `livrer` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`idcommande_menu`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+ALTER TABLE `commande` CHANGE `daty` `daty` DATETIME NOT NULL;
