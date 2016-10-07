@@ -48,7 +48,7 @@ public class CommandeAction extends Action {
 			List<java.util.Map<String, Object>> rep=DaoModele.getInstance().excecuteQuery("select case when max(idensemble) is null then 0 else max(idensemble)  end as idensemble from commande", conn);
 			if(rep.size()==0)
 				throw new Exception("Problem au niveau serveur");
-			idEnsemble=(int) rep.get(0).get("idensemble") + 1;
+			idEnsemble=Integer.valueOf(String.valueOf(rep.get(0).get("idensemble")) )+ 1;
 			
 			comm.setIdensemble(idEnsemble);
 			comm.setLastensemble(idEnsemble);
@@ -69,15 +69,7 @@ public class CommandeAction extends Action {
 			}
 			DaoModele.getInstance().save(mcs, conn);
 			
-			
-			OptionObject ob=new OptionObject();
-			ob.setReferenceForField("idint", "idensemblt");
-			ob.setReferenceForField("valint", "idtable");
-			ob.setIdint(idEnsemble);
-			ob.setValint(t.getIdtable());
-			ob.setNomTable("commande_ensemble_table");
-			
-			DaoModele.getInstance().save(ob, conn);
+			DaoModele.getInstance().executeUpdate("insert into commande_ensemble_table (idtable,idensemble) values("+idEnsemble+","+t.getIdtable()+")", conn);
 			
 			t.setEtat(ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE);
 			DaoModele.getInstance().update(t, conn);

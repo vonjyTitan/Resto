@@ -59,7 +59,7 @@ public class TableBuilder<T extends DataEntity>  extends HTMLBuilder<T>{
 		for(Champ f:fieldsAvalaible){
 			if(f.getName().compareToIgnoreCase(entity.getPkName())==0 || isNotVisible(f))
 				continue;
-			reponse+="<th>"+getSigne(f.getField())+" <a href=\""+getSimpleLien()+"&nomChampOrder="+f.getName()+"&ordering="+getOrderForField(f.getField())+"\"> "+f.getLibelle()+"<a></th>";
+			reponse+="<th>"+getSigne(f.getField())+" <a href=\""+getSimpleLien()+"&nomChampOrder="+entity.getReferenceForField(f.getField())+"&ordering="+getOrderForField(f.getField())+"\"> "+f.getLibelle()+"<a></th>";
 		}
 		reponse+="<th>Options</th>";
 		reponse+="</tr>";

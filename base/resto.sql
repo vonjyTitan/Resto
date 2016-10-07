@@ -464,10 +464,10 @@ create or replace view ensemble_commande
 as 
 select 
 cet.idensemble,
-max(DATE(com.daty) as daty,
+max(DATE(com.daty)) as daty,
 group_concat(cet.idtable) as idtable,
 group_concat(table_liste.nom) as table_liste,
-sum(com.nombre_client) as client,
+sum(com.nombre_client) as nombre_client,
 group_concat(com.idcommande) as idcommande
 from 
 commande as com
@@ -479,3 +479,12 @@ left join
 table_liste on table_liste.idtable=cet.idtable
 group by cet.idensemble
 order by daty desc;
+
+create or replace view menu_commande_libelle
+as select 
+mc.*,
+menu.libelle as menu
+from 
+menu_commande as mc
+left join menu
+on menu.idmenu=mc.idmenu;

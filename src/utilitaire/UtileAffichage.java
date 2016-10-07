@@ -10,6 +10,8 @@ import java.util.Date;
 
 public class UtileAffichage {
 	public static Object getNonNullValue(Object value,Class f){
+		if(value=="")
+			return "";
 		if(f.equals(String.class)){
 			if(value==null)
 				return "";

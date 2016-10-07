@@ -243,7 +243,7 @@ try{
                       </a>
                       <ul class="sub">
                           <li><a  href="main.jsp?cible=commande/commande-ajout&currmenu=menu-commmande-ajout" id="menu-commmande-ajout">Ajout commande</a></li>
-                          <li><a  href="buttons.html">Liste des commandes</a></li>
+                          <li><a  href="main.jsp?cible=commande/commande-liste&currmenu=menu-commande-liste" id="menu-commande-liste">Liste des commandes</a></li>
                       </ul>
                   </li>
                   <li class="sub-menu">

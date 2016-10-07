@@ -12,18 +12,24 @@ import dao.DaoModele;
 import utilitaire.SessionUtil;
 import utilitaire.UtileAffichage;
 
-public class PageFiche extends HTMLBuilder<DataEntity> {
+public class PageFiche<T extends DataEntity> extends HTMLBuilder<DataEntity> {
 
-	public PageFiche(DataEntity entity, HttpServletRequest request) throws Exception {
+	private T data;
+	
+	public PageFiche(T entity, HttpServletRequest request) throws Exception {
 		super(entity, request);
 	}
 	public String getBody() throws Exception{
 		Connection conn=null;
 			try{
 				conn=Connecteur.getConnection(entity.findDataBaseKey());
-				entity=DaoModele.getInstance().findById(entity, Integer.valueOf(SessionUtil.getValForAttr(request, "id")),conn);
-				if(entity==null)
-					throw new Exception("Pas de resultat pour votre consultation");
+				if(data==null){
+					entity=DaoModele.getInstance().findById(entity, Integer.valueOf(SessionUtil.getValForAttr(request, "id")),conn);
+					if(entity==null)
+						throw new Exception("Pas de resultat pour votre consultation");
+					data=(T) entity;
+				}
+				entity=data;
 				String reponse="";
 				
 				
@@ -92,5 +98,11 @@ public class PageFiche extends HTMLBuilder<DataEntity> {
 			champ.setLien(lien+"&"+paramName+"=",paramVal);
 		else
 			champ.setLien(lien+"?"+paramName+"=",paramVal);
+	}
+	public void setData(T data){
+		this.data=data;
+	}
+	public T getData(){
+		return this.data;
 	}
 }

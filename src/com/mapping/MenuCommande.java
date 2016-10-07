@@ -11,6 +11,7 @@ public class MenuCommande extends DataEntity {
 	private String remarque;
 	private int annuler;
 	private int livrer;
+	private String menu;
 	public int getIdcommande_menu() {
 		return idcommande_menu;
 	}
@@ -52,5 +53,11 @@ public class MenuCommande extends DataEntity {
 	}
 	public void setLivrer(int livrer) {
 		this.livrer = livrer;
+	}
+	public String getMenu() {
+		return menu;
+	}
+	public void setMenu(String menu) {
+		this.menu = menu;
 	}
 }
