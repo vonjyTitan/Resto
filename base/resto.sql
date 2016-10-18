@@ -415,6 +415,8 @@ CREATE TABLE IF NOT EXISTS `annulation_menu` (
   `cause` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+ALTER TABLE `annulation_menu` ADD `idannulation` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;
+ALTER TABLE `annulation_menu` ADD `daty` DATETIME NOT NULL ;
 -- --------------------------------------------------------
 
 --
@@ -488,3 +490,12 @@ from
 menu_commande as mc
 left join menu
 on menu.idmenu=mc.idmenu;
+
+
+CREATE TABLE IF NOT EXISTS `livraison_menu` (
+  `idlivraison` int(11) NOT NULL AUTO_INCREMENT,
+  `idmenu_commande` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `daty` datetime NOT NULL,
+  PRIMARY KEY (`idlivraison`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;

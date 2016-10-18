@@ -8,26 +8,31 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mapping.AnnulationMenu;
 import com.mapping.Commande;
 import com.mapping.ConstantEtat;
+import com.mapping.LivraisonMenu;
 import com.mapping.MenuCommande;
 import com.mapping.OptionObject;
 import com.mapping.Table;
 import com.rooteur.Action;
+import com.service.CommandeService;
 
 import dao.Connecteur;
 import dao.DaoModele;
+import utilitaire.SessionUtil;
 import utilitaire.UtileAffichage;
 import utilitaire.Utilitaire;
 
 public class CommandeAction extends Action {
-	public void ajout(HttpServletRequest request,HttpServletResponse response)throws Exception{
+	synchronized public void ajout(HttpServletRequest request,HttpServletResponse response)throws Exception{
 		String [] menus=request.getParameterValues("menu");
 		String [] quantite=request.getParameterValues("quantite");
 		String [] remarque=request.getParameterValues("remarque");
 		if(menus==null || menus.length==0){
 			throw new Exception("Une commande doit avoir un menu au moins");
 		}
+		
 		String nbClient=request.getParameter("client");
 		int client=Integer.valueOf("0"+nbClient);
 		if(client<=0){
@@ -60,6 +65,12 @@ public class CommandeAction extends Action {
 			int taille=menus.length;
 			List<MenuCommande> mcs=new ArrayList<MenuCommande>(taille);
 			for(int i=0;i<taille;i++){
+				int idmenu=Integer.valueOf("0"+menus[i]);
+				int nombre=Integer.valueOf("0"+quantite[i]);
+				if(idmenu==0 && nombre==0)
+					continue;
+				if(idmenu==0 && nombre>0)
+					throw new Exception("Selection de menu obligatoire si le quantitE est positif");
 				mc=new MenuCommande();
 				mc.setRemarque(remarque[i]);
 				mc.setIdmenu(Integer.valueOf("0"+menus[i]));
@@ -69,7 +80,7 @@ public class CommandeAction extends Action {
 			}
 			DaoModele.getInstance().save(mcs, conn);
 			
-			DaoModele.getInstance().executeUpdate("insert into commande_ensemble_table (idtable,idensemble) values("+idEnsemble+","+t.getIdtable()+")", conn);
+			DaoModele.getInstance().executeUpdate("insert into commande_ensemble_table (idensemble,idtable) values("+idEnsemble+","+t.getIdtable()+")", conn);
 			
 			t.setEtat(ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE);
 			DaoModele.getInstance().update(t, conn);
@@ -85,5 +96,60 @@ public class CommandeAction extends Action {
 			if(conn!=null)
 				conn.close();
 		}
+	}
+	public void annuler(HttpServletRequest request,HttpServletResponse response)throws Exception {
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(); 
+			conn.setAutoCommit(false);
+			
+			AnnulationMenu annulation=new AnnulationMenu();
+			annulation.setIdcommande_menu(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id")));
+			annulation.setCause(SessionUtil.getValForAttr(request, "motif"));
+			annulation.setDate(new java.sql.Date(UtileAffichage.getDateNow().getTime()));
+			annulation.setQuantite(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "quantite")));
+			
+			DaoModele.getInstance().save(annulation, conn);
+			
+			CommandeService.getInstance().calculeQuantiteAnnuler(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id")), conn);
+			conn.commit();
+		}
+		catch(Exception ex){
+			if(conn!=null)
+				conn.rollback();
+			throw ex;
+		}
+		finally {
+			if(conn!=null)
+				conn.close();
+		}
+		goTo(request, response , "get","main.jsp?cible=commande/commande-fiche&id="+SessionUtil.getValForAttr(request, "idensemble"));
+	}
+	public void livrer(HttpServletRequest request,HttpServletResponse response)throws Exception {
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection(); 
+			conn.setAutoCommit(false);
+			
+			LivraisonMenu livraison=new LivraisonMenu();
+			livraison.setIdmenu_commande(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id")));
+			livraison.setDate(new java.sql.Date(UtileAffichage.getDateNow().getTime()));
+			livraison.setQuantite(Integer.valueOf(SessionUtil.getValForAttr(request, "quantite")));
+			
+			DaoModele.getInstance().save(livraison, conn);
+			
+			CommandeService.getInstance().calculeQuantiteLivrer(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id")), conn);
+			conn.commit();
+		}
+		catch(Exception ex){
+			if(conn!=null)
+				conn.rollback();
+			throw ex;
+		}
+		finally {
+			if(conn!=null)
+				conn.close();
+		}
+		goTo(request, response , "get","main.jsp?cible=commande/commande-fiche&id="+SessionUtil.getValForAttr(request, "idensemble"));
 	}
 }
