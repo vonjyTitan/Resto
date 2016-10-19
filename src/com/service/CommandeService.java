@@ -1,10 +1,13 @@
 package com.service;
 
 import java.sql.Connection;
+import java.util.List;
 
+import com.mapping.Commande;
 import com.mapping.MenuCommande;
 
 import dao.Connecteur;
+import dao.DaoModele;
 
 public class CommandeService {
 	private static CommandeService instance;
@@ -49,6 +52,40 @@ public class CommandeService {
 			conn=Connecteur.getConnection();
 			conn.setAutoCommit(false);
 			calculeQuantiteLivrer(idmenucommande,conn);
+			conn.commit();
+		}
+		catch(Exception ex){
+			if(conn!=null)
+				conn.rollback();
+			throw ex;
+		}
+		finally{
+			if(conn!=null)
+				conn.close();
+		}
+	}
+	public void addMenuForCommande(MenuCommande mc,int idensemble,Connection conn)throws Exception
+	{
+		List<MenuCommande> already=DaoModele.getInstance().findPageGenerique(1, mc, conn, "");
+		if(already.size()>0){
+			MenuCommande alr=already.get(0);
+			alr.setQuantite(alr.getQuantite()+mc.getQuantite());
+			DaoModele.getInstance().update(alr, conn);
+			return;
+		}
+		List<Commande> coms=DaoModele.getInstance().findPageGenerique(1, new Commande(), conn, " and idensemble="+idensemble);
+		if(coms.size()==0)
+			throw new Exception("Probleme au niveau serveur, commande introuvable");
+		mc.setIdcommande(coms.get(0).getIdcommande());
+		DaoModele.getInstance().save(mc, conn);
+	}
+	public void addMenuForCommande(MenuCommande mc,int idensemble)throws Exception
+	{
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection();
+			conn.setAutoCommit(false);
+			addMenuForCommande(mc,idensemble,conn);
 			conn.commit();
 		}
 		catch(Exception ex){

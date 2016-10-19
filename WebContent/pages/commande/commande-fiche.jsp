@@ -20,9 +20,12 @@
 	MenuCommande crit=new MenuCommande();
 	crit.setNomTable("menu_commande_libelle");
 	List<MenuCommande> mcs=DaoModele.getInstance().findPageGenerique(1, crit," and idcommande in ("+((Commande)fiche.getData()).getIdcommande()+")");
+	Menu critM=new Menu();
+	critM.setPackSize(100);
+	List<Menu> menus=DaoModele.getInstance().findPageGenerique(1, critM);
+
 %>
 <%=HTMLBuilder.beginPanel("Liste des menus", 8)%>
-<form action="commande-multipleaction" method="post">
 <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
 <table class="table table-striped table-advance table-hover table-bordered">
 	<thead>
@@ -30,7 +33,7 @@
 			<th>Id</th>
 			<th>Menu</th>
 			<th>Remarque</th>
-			<th>Quantité</th>
+			<th>Qté</th>
 			<th>Annulé</th>
 			<th>Livré</th>
 			<th></th>
@@ -51,9 +54,10 @@
 			<td><%=mc.getAnnuler() %></td>
 			<td><%=mc.getLivrer() %></td>
 			<td><input style="width:60px;" <%=((enable) ? "disabled" : "") %> type="number" name="quantite" value="<%=reste%>"/></td>
-			<td>
-			<a class="btn btn-primary btn-xs" name="livrer" <%=((enable) ? "disabled" : "") %> href="javascript:;">Livrer</a>
+			<td style="width: 180px;">
+			<a class="btn btn-success btn-xs" name="livrer" <%=((enable) ? "disabled" : "") %> href="javascript:;">Livrer</a>
 			<a class="btn btn-warning btn-xs"  name="annuler" <%=((enable) ? "disabled" : "") %> href="javascript:;">Annuler</a>
+			<a class="btn btn-primary btn-xs"  name="rajouter" href="javascript:;">Rajouter</a>
 			<input type="hidden" name="id" value="<%=mc.getIdcommande_menu() %>"/>
 			</td>
 			</tr>
@@ -62,6 +66,28 @@
 		%>
 	</tbody>
 </table>
+</div>
+<div class="col-lg-12" style="border-top: 1px solid #eff2f7;">
+	<h5 style="text-align: center;">Ajouter d'autres menus</h5>
+	<form action="commande-ajoutMenus" method="post">
+	<input name="idensemble" value="<%=SessionUtil.getValForAttr(request, "id") %>" type="hidden"/>
+		<table class="table table-striped table-advance table-hover table-bordered">
+	<thead>
+		<tr>
+			<th>Menu</th>
+			<th>Quantite</th>
+			<th>Remarque</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody id="ajout-menu"></tbody>
+</table>
+<div class="col-lg-12" style="text-align:center;">
+<a href="javascript:;" id="adddmenu" class="btn btn-primary btn-xs" style="width:150px;"><i class="fa fa-plus"></i></a>
+<br>
+<input type="submit" class="btn btn-success btn-xs" style="width: 150px;margin-top: 10px;" value="Envoyer"/>
+</div>
+	</form>
 </div>
 <form action="commande-annuler" id="menu-annuler" style="display: none;" method="post">
 	<input name="id" id="idannulation" type="hidden"/>
@@ -96,6 +122,32 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="rajout" style="margin-top:100px;margin-left:100px;">
+	<div class="modal-dialog">
+	<form action="commande-rajoutMenu" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" style="color: white;" aria-label="Close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">x</span>
+                </button>
+                <h4>Quantité</h4>
+            </div>
+            <div class="modal-body">
+            <input name="idensemble" value="<%=SessionUtil.getValForAttr(request, "id") %>" type="hidden"/>
+                <input type="number" name="quantite" value="1"/>
+                <input name="idcommande_menu" type="hidden" id="idmc_rajout"/>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="col-lg-12">
+                <input type="submit" class="btn btn-primary btn-xs" name="confirme-rajout"  value="Confirmer"/>
+				<a class="btn btn-warning btn-xs closes"  href="javascript:;">Annuler</a>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
 <%=HTMLBuilder.endPanel()%>
 <%=fiche.beginPanel("Fiche", 4)%>
 <%=fiche.getBody() %>
@@ -105,7 +157,10 @@
 </div>
 <%=fiche.endPanel() %>
 <script>
+var taille=<%=menus.size()%>;
+var menus=[];
 	$(document).ready(function(){
+		<%int ii=0;for(Menu menu:menus){%>menus[<%=ii%>]=[];menus[<%=ii%>]["id"]=<%=menu.getIdmenu()%>;menus[<%=ii%>]["lib"]='<%=menu.getLibelle()%>';<%ii++;}%>
 		$("a[name='livrer']").on("click",function(){
 			$("#quantitelivraison").prop("value",$(this).parent().parent().find("input[name='quantite']").prop("value"));
 			$("#idlivraison").prop("value",$("> input",$(this).parent()).prop("value"));
@@ -116,16 +171,37 @@
 			$("#idannulation").prop("value",$("> input",$(this).parent()).prop("value"));
 			$("#motif").prop("class","modal show");
 		});
+		$("a[name='rajouter']").on("click",function(){
+			$("#idmc_rajout").prop("value",$("input",$(this).parent()).prop("value"));
+			$("#rajout").prop("class","modal show");
+		});
 		$(".close").on("click",function(){
 			$("#motif").prop("class","modal fade");
 		});
 		$(".closes").on("click",function(){
-			$("#motif").prop("class","modal fade");
+			$(this).parents(".modal").prop("class","modal fade");
 		});
 		$("a[name='confirme']").on("click",function(){
 			$("#motif").prop("class","modal fade");
 			$("#motifannulation").prop("value",$("#motif-text").prop("value"));
 			$("#menu-annuler").submit();
 		});
+		$("#adddmenu").on("click",function(){
+			addChild();
+		});
+		addChild();
+		addChild();
 	});
-</script>
+	function addChild(){
+		var node = "<tr><td><select name=\"menu\"><option value=0 >--</option>";
+		for(var ii=0;ii<taille;ii++){
+				node+="<option value=\""+menus[ii]["id"]+"\">"+menus[ii]["lib"]+"</option>";
+		}
+		node+="</select></td>";
+		node+="<td><input name=\"quantite\" type=\"number\"/></td>"
+		+"<td style=\"width: 100px;\"><textarea style=\"height: 25px;\" name=\"remarque\"></textarea></td><td><a href=\"javascript:;\" name=\"suppr\" class=\"suppr btn btn-danger btn-xs\"><i class=\"fa fa-trash-o\"></i></a></td></tr>";
+		
+		$("#ajout-menu").append(node);
+		$("[name='suppr']").on("click",function(){$(this).parent("td").parent("tr").remove();});
+	}
+	</script>

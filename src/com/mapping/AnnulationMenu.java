@@ -13,6 +13,8 @@ public class AnnulationMenu extends DataEntity{
 	@Parameter(reference="daty")
 	private Date date;
 	private String cause;
+	private int idutilisateur;
+	private String utilisateur;
 	public int getIdannulation() {
 		return idannulation;
 	}
@@ -42,5 +44,17 @@ public class AnnulationMenu extends DataEntity{
 	}
 	public void setCause(String cause) {
 		this.cause = cause;
+	}
+	public int getIdutilisateur() {
+		return idutilisateur;
+	}
+	public void setIdutilisateur(int idutilisateur) {
+		this.idutilisateur = idutilisateur;
+	}
+	public String getUtilisateur() {
+		return utilisateur;
+	}
+	public void setUtilisateur(String utilisateur) {
+		this.utilisateur = utilisateur;
 	}
 }

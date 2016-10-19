@@ -417,6 +417,7 @@ CREATE TABLE IF NOT EXISTS `annulation_menu` (
 
 ALTER TABLE `annulation_menu` ADD `idannulation` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;
 ALTER TABLE `annulation_menu` ADD `daty` DATETIME NOT NULL ;
+ALTER TABLE `annulation_menu` ADD `idutilisateur` INT NOT NULL ;
 -- --------------------------------------------------------
 
 --
