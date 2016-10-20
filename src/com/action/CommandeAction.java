@@ -57,6 +57,7 @@ public class CommandeAction extends Action {
 				throw new Exception("Problem au niveau serveur");
 			idEnsemble=Integer.valueOf(String.valueOf(rep.get(0).get("idensemble")) )+ 1;
 			
+			comm.setEtat(1);
 			comm.setIdensemble(idEnsemble);
 			comm.setLastensemble(idEnsemble);
 			comm.setNbPersonnes(client);
@@ -113,9 +114,8 @@ public class CommandeAction extends Action {
 			
 			Utilisateur user=(Utilisateur) request.getSession().getAttribute("utilisateur");
 			annulation.setIdutilisateur(user.getIdutilisateur());
-			DaoModele.getInstance().save(annulation, conn);
+			CommandeService.getInstance().annulerMenu(annulation, conn);
 			
-			CommandeService.getInstance().calculeQuantiteAnnuler(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "id")), conn);
 			conn.commit();
 		}
 		catch(Exception ex){
@@ -207,6 +207,11 @@ public class CommandeAction extends Action {
 		}
 		mc.setQuantite(mc.getQuantite()+q);
 		DaoModele.getInstance().update(mc);
+		goTo(request, response , "get","main.jsp?cible=commande/commande-fiche&id="+SessionUtil.getValForAttr(request, "idensemble"));
+	}
+	public void annulerTous(HttpServletRequest request,HttpServletResponse response)throws Exception
+	{
+		CommandeService.getInstance().annulerComande(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "idensemble")),SessionUtil.getValForAttr(request, "motif"));
 		goTo(request, response , "get","main.jsp?cible=commande/commande-fiche&id="+SessionUtil.getValForAttr(request, "idensemble"));
 	}
 }

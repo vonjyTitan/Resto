@@ -265,7 +265,27 @@ INSERT INTO `roleactivite` (`idrole`, `activite`) VALUES
 (1, 'menu-ajout'),
 (2, 'menu-ajout'),
 (1, 'menu-modif'),
-(2, 'menu-modif');
+(2, 'menu-modif'),
+(1, 'commande/commande-ajout'),
+(2, 'commande/commande-ajout'),
+(1, 'commande-ajout'),
+(2, 'commande-ajout'),
+(1, 'commande/commande-liste'),
+(2, 'commande/commande-liste'),
+(1, 'commande/commande-fiche'),
+(2, 'commande/commande-fiche'),
+(1, 'commande-livrer'),
+(2, 'commande-livrer'),
+(1, 'commande-annuler'),
+(2, 'commande-annuler'),
+(1, 'commande-annuler'),
+(2, 'commande-annuler'),
+(1, 'commande-ajoutMenus'),
+(2, 'commande-ajoutMenus'),
+(1, 'commande-rajoutMenu'),
+(2, 'commande-rajoutMenu'),
+(1, 'commande-annulerTous'),
+(2, 'commande-annulerTous');
 
 -- --------------------------------------------------------
 
@@ -432,7 +452,7 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `lastensemble` int(11) NOT NULL,
   PRIMARY KEY (`idcommande`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
-
+ALTER TABLE `commande` ADD `etat` INT NULL DEFAULT '1';
 -- --------------------------------------------------------
 
 --
@@ -471,7 +491,8 @@ max(DATE(com.daty)) as daty,
 group_concat(cet.idtable) as idtable,
 group_concat(table_liste.nom) as table_liste,
 sum(com.nombre_client) as nombre_client,
-group_concat(com.idcommande) as idcommande
+group_concat(com.idcommande) as idcommande,
+max(com.etat) as etat
 from 
 commande as com
 join 

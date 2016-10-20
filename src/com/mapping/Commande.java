@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 
 import com.annotations.Entity;
+import com.annotations.ForeignKey;
 import com.annotations.Parameter;
 
 @Entity(reference="commande",pkName="idcommande")
@@ -16,6 +17,7 @@ public class Commande extends DataEntity {
 	private Date daty;
 	private int idensemble;
 	private int lastensemble;
+	private int etat;
 	public String getTable_liste() {
 		return table_liste;
 	}
@@ -67,6 +69,17 @@ public class Commande extends DataEntity {
 			rr="";
 		rr+="<a href=\"main.jsp?cible=commande/commande-fiche&id="+idensemble+"\" class=\"btn btn-primary btn-xs\">voir</a>";
 		return rr;
+	}
+	public int getEtat() {
+		return etat;
+	}
+	public void setEtat(int etat) {
+		this.etat = etat;
+	}
+	public String etatString(){
+		if(etat==1)
+			return "Active";
+		return "Annulée";
 	}
 	
 }
