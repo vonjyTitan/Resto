@@ -15,7 +15,7 @@
 		throw new Exception("Pas de resultat pour votre consultation");
 	PageFiche fiche=new PageFiche<Commande>(commande,request);
 	fiche.setData(cms.get(0));
-	String disable=(cms.get(0).getEtat()==2) ? "disabled=true" : "";
+	String disable=(cms.get(0).getEtat()==ConstantEtat.ETAT_COMMANDE_ANNULER) ? "disabled=true" : "";
 	fiche.setOrdre(new String[]{"idcommande","table_liste"});
 	fiche.removeChamp(new String[]{"idtable"});
 	MenuCommande crit=new MenuCommande();
@@ -25,7 +25,11 @@
 	critM.setPackSize(100);
 	List<Menu> menus=DaoModele.getInstance().findPageGenerique(1, critM);
 
-%>
+	%>
+		<h4><a href="main.jsp?cible=commande/commande-liste"><i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i></a> Fiche commande ensemble numero <%if(cms.get(0).getEtat()==ConstantEtat.ETAT_COMMANDE_ANNULER){
+			%><strong style="color : red !important;"> , Commande annulée </strong><%
+	}%></h4>
+
 <%=HTMLBuilder.beginPanel("Liste des menus", 8)%>
 <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
 <table class="table table-striped table-advance table-hover table-bordered">
@@ -54,8 +58,8 @@
 			<td><%=mc.getQuantite() %></td>
 			<td><%=mc.getAnnuler() %></td>
 			<td><%=mc.getLivrer() %></td>
-			<td><input <%=disable %> style="width:60px;" <%=((enable) ? "disabled" : "") %> type="number" name="quantite" value="<%=reste%>"/></td>
-			<td style="width: 180px;">
+			<td><input <%=disable %> style="width:60px;" <%=((enable) ? "disabled" : "") %> type="number" name="quantite" max="<%=reste%>" value="<%=reste%>"/></td>
+			<td style="width: 200px;">
 			<a class="btn btn-success btn-xs" <%=disable %> name="livrer" <%=((enable) ? "disabled" : "") %> href="javascript:;">Livrer</a>
 			<a class="btn btn-warning btn-xs" <%=disable %>  name="annuler" <%=((enable) ? "disabled" : "") %> href="javascript:;">Annuler</a>
 			<a class="btn btn-primary btn-xs" <%=disable %>  name="rajouter" href="javascript:;">Rajouter</a>
@@ -148,6 +152,64 @@
         </form>
     </div>
 </div>
+<div class="modal fade" id="addition" style="margin-top:100px;margin-left:100px;">
+	<div class="modal-dialog">
+	<form action="commande-addition" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" style="color: white;" aria-label="Close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">x</span>
+                </button>
+                <h4>Addition</h4>
+            </div>
+            <div class="modal-body">
+            <input name="idensemble" value="<%=SessionUtil.getValForAttr(request, "id") %>" type="hidden"/>
+                <div class="">
+<table class="table table-striped table-advance table-hover table-bordered">
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Menu</th>
+			<th>Remarque</th>
+			<th>Qté</th>
+			<th>Payé</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<%
+		for(MenuCommande mc:mcs){
+			if(mc.getQuantite()-mc.getAnnuler()<=0)
+				continue;
+			int reste=(mc.getQuantite()-mc.getAnnuler()-mc.getPayer());
+			boolean enable=reste<=0;
+		%>
+		<tr>
+			<td><%=mc.getIdcommande_menu() %></td>
+			<td><%=mc.getMenu() %></td>
+			<td><%=mc.getRemarque() %></td>
+			<td><%=(mc.getQuantite()-mc.getAnnuler()) %></td>
+			<td><%=mc.getPayer() %></td>
+			<td><input style="width:60px;" <%=((enable) ? "disabled" : "") %> type="number" name="quantite" max="<%=reste%>" value="<%=reste%>"/></td>
+			</tr>
+		<%
+		}
+		%>
+	</tbody>
+</table>
+</div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="col-lg-12">
+                <input type="submit" class="btn btn-primary btn-xs" name="confirme-rajout"  value="Confirmer"/>
+				<a class="btn btn-warning btn-xs closes"  href="javascript:;">Annuler</a>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
 <%=HTMLBuilder.endPanel()%>
 <%=fiche.beginPanel("Fiche", 4)%>
 <%=fiche.getBody() %>
@@ -186,6 +248,9 @@ var menus=[];
 		$("a[name='annuler-tous']").on("click",function(){
 			$("#form-annulation").prop("action","commande-annulerTous");
 			$("#motif").prop("class","modal show");
+		});
+		$("a[name='addition']").on("click",function(){
+			$("#addition").prop("class","modal show");
 		});
 		$("#adddmenu").on("click",function(){
 			addChild();

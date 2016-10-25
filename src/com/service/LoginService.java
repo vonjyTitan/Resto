@@ -35,7 +35,7 @@ public class LoginService {
 			List<Utilisateur> rep=DaoModele.getInstance().findPageGenerique(1, ob,connex," and login='"+login.replace("'", "")+"' and passe='"+UtilCrypto.encrypt(passe)+"' and active=1");
 			if(rep.size()>0)
 			{
-				NotificationService.getInstance().saveNotification(Notification.LOGIN, rep.get(0).getIdutilisateur(), connex, rep.get(0));
+				NotificationService.getInstance().saveNotification("L'utilisateur "+rep.get(0).getNom()+" s'est connecter dans le system", rep.get(0).getIdutilisateur(), connex, rep.get(0));
 				return rep.get(0);
 			}
 			connex.commit();

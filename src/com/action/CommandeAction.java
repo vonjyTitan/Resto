@@ -43,7 +43,7 @@ public class CommandeAction extends Action {
 		String table=request.getParameter("idtable");
 		int idtable=Integer.valueOf("0"+table);
 		Table t=DaoModele.getInstance().findById(new Table(), idtable);
-		if(t==null || t.getEtat()!=ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE){
+		if(t==null || t.getEtat()!=ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE){
 			throw new Exception("Table selectionnEe invalide");
 		}
 		Connection conn=null;
@@ -85,7 +85,7 @@ public class CommandeAction extends Action {
 			
 			DaoModele.getInstance().executeUpdate("insert into commande_ensemble_table (idensemble,idtable) values("+idEnsemble+","+t.getIdtable()+")", conn);
 			
-			t.setEtat(ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE);
+			t.setEtat(ConstantEtat.ETAT_TABLE_OCCUPER_AVEC_COMMANDE);
 			DaoModele.getInstance().update(t, conn);
 			conn.commit();
 			goTo(request, response , "get","main.jsp?cible=commande/commande-liste&idensemble="+idEnsemble+"&idcommande="+comm.getIdcommande());
@@ -213,5 +213,19 @@ public class CommandeAction extends Action {
 	{
 		CommandeService.getInstance().annulerComande(Integer.valueOf("0"+SessionUtil.getValForAttr(request, "idensemble")),SessionUtil.getValForAttr(request, "motif"));
 		goTo(request, response , "get","main.jsp?cible=commande/commande-fiche&id="+SessionUtil.getValForAttr(request, "idensemble"));
+	}
+	public void jumellage(HttpServletRequest request,HttpServletResponse response)throws Exception{
+		String idensembles[]=request.getParameterValues("id");
+		if(idensembles==null || idensembles.length==0)
+			throw new Exception("Aucune ensemble selectionnee");
+		if( idensembles.length==1)
+			throw new Exception("Element selectionnee obligatoirement superieurs a 1 en nombre");
+		int taille=idensembles.length;
+		int[] idens=new int[taille];
+		for(int i=0;i<taille;i++){
+			idens[i]=Integer.valueOf("0"+idensembles[i]);
+		}
+		CommandeService.getInstance().jumellerCommande(idens);
+		goTo(request, response , "get","main.jsp?cible=commande/commande-fiche&id="+idens[0]);
 	}
 }

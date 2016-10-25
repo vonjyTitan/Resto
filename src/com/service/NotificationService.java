@@ -20,40 +20,15 @@ public class NotificationService {
 			new NotificationService();
 		return instance;
 	}
-	public void saveNotification(int type,int idutilisateur,Connection connex,DataEntity other)throws Exception{
-		String description="";
-		switch(type){
-			case Notification.AJOUT_COMMANDE:{
-				description+=" a ajouté une commande pour la table ";
-			}
-			case Notification.AJOUT_RESERVATION:{
-				description+=" a ajouté une reservation venant de M(r/me) ";
-			}
-			case Notification.ANNULATION_RESERVATION:{
-				description+=" a annulé une reservation venant de M(r/me) ";
-			}
-			case Notification.CONFIRMATION_RESERVATION:{
-				description+=" la reservation de M(r/me) a été confirmer par ";
-			}
-			case Notification.ANNULATION_COMMANDE:{
-				description+=" a annulé une commande pour la table ";
-			}
-			case Notification.ANNULATION_MENUE:{
-				description+=" a annulé un menu pour la table ";
-			}
-			case Notification.AJOUT_MENUE:{
-				description+=" a ajouté un menu pour la table ";
-			}
-		}
-		Notification notif=new Notification(description,"",type,0,idutilisateur);
+	public void saveNotification(String description,int idutilisateur,Connection connex,DataEntity other)throws Exception{
+		Notification notif=new Notification(description,"",0,idutilisateur);
 		//DaoModele.getInstance().save(notif, connex);
-		
 	}
-	public void saveNotification(int type,int idutilisateur,DataEntity other)throws Exception{
+	public void saveNotification(String description,int idutilisateur,DataEntity other)throws Exception{
 		Connection connex=null;
 		try{
 			connex=Connecteur.getConnection();
-			saveNotification(type,idutilisateur,connex,other);
+			saveNotification(description,idutilisateur,connex,other);
 		}
 		catch(Exception ex){
 			throw ex;

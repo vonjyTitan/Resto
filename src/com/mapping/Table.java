@@ -49,27 +49,27 @@ public class Table extends DataEntity {
 		this.etat = etat;
 	}
 	public String getEtatString() {
-		if(etat==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE){
+		if(etat==ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE){
 			return "<span class=\"label label-primary label-mini\">Occupé sans commande</span>";
 		}
-		else if(etat==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
+		else if(etat==ConstantEtat.ETAT_TABLE_OCCUPER_AVEC_COMMANDE)
 			return "<span class=\"label label-warning label-mini\">Occupé</span>";
-		else if(etat==ConstantEtat.ETAT_LIBRE)
+		else if(etat==ConstantEtat.ETAT_TABLE_LIBRE)
 			return "<span class=\"label label-success label-mini\">Libre</span>";
-		else if(etat==ConstantEtat.ETAT_RESERVER)
+		else if(etat==ConstantEtat.ETAT_TABLE_RESERVER)
 			return "<span class=\"label label-warning label-mini\">Reservé</span>";
 		return "";
 	}
 	public String getOption(){
 		String reponse=" <a class=\"btn btn-primary btn-xs\" href=\"main.jsp?cible=configuration/table-modif&id="+idtable+"\"><i class=\"fa fa-pencil\"></i></a> ";
-		if(etat==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE){
+		if(etat==ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE){
 			reponse+="<a class=\"btn btn-success btn-xs\" href=\"table-liberer?id="+idtable+"\" style=\"width: 70px;\">Liberer</a>";
 		}
-		else if(etat==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
-			reponse+="<a class=\"btn btn-warning btn-xs\" href=\"table-transferer?id="+idtable+"\" style=\"width: 70px;\">Transferer</a>";
-		else if(etat==ConstantEtat.ETAT_LIBRE)
+		else if(etat==ConstantEtat.ETAT_TABLE_OCCUPER_AVEC_COMMANDE)
+			reponse+="<a class=\"btn btn-warning btn-xs\" href=\"javascript:;\" name=\"transfertsimple\" data=\""+idtable+"\" style=\"width: 70px;\">Transferer</a>";
+		else if(etat==ConstantEtat.ETAT_TABLE_LIBRE)
 			reponse+="<a class=\"btn btn-primary btn-xs\" href=\"table-occuper?id="+idtable+"\" style=\"width: 70px;\">Occuper</a>";
-		else if(etat==ConstantEtat.ETAT_RESERVER)
+		else if(etat==ConstantEtat.ETAT_TABLE_RESERVER)
 			return reponse;
 		return reponse;
 	}

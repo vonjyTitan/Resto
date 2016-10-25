@@ -482,6 +482,7 @@ CREATE TABLE IF NOT EXISTS `menu_commande` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 ALTER TABLE `commande` CHANGE `daty` `daty` DATETIME NOT NULL;
+ALTER TABLE `menu_commande` ADD `payer` INT NOT NULL ;
 
 create or replace view ensemble_commande
 as 

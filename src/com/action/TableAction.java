@@ -95,7 +95,7 @@ public class TableAction extends Action {
 			goTo(request,response,"main.jsp?cible=configuration/table-ajout&erreur=Champ invalide");
 			return;
 		}
-		table.setEtat(ConstantEtat.ETAT_LIBRE);
+		table.setEtat(ConstantEtat.ETAT_TABLE_LIBRE);
 		DaoModele.getInstance().save(table);
 		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 	}
@@ -117,15 +117,15 @@ public class TableAction extends Action {
 			}
 			for(Table tu:toup)
 			{
-				if(tu.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE)
+				if(tu.getEtat()==ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_TABLE_OCCUPER_AVEC_COMMANDE)
 				{
 					throw new Exception("Impossible d'occuper la table car elle est deja pris");
 				}
-				if( tu.getEtat()==ConstantEtat.ETAT_RESERVER)
+				if( tu.getEtat()==ConstantEtat.ETAT_TABLE_RESERVER)
 				{
 					throw new Exception("Impossible d'occuper la table car elle est reserver");
 				}
-				tu.setEtat(ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE);
+				tu.setEtat(ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE);
 			}
 			DaoModele.getInstance().update(toup,conn,"");
 			conn.commit();
@@ -160,10 +160,10 @@ public class TableAction extends Action {
 			for(Table tu:toup)
 			{
 				
-				if(tu.getEtat()==ConstantEtat.ETAT_OCCUPER_AVEC_COMMANDE){
+				if(tu.getEtat()==ConstantEtat.ETAT_TABLE_OCCUPER_AVEC_COMMANDE){
 					throw new Exception("Impossible de liberer la table car il y a encore des commandes en cours pour elle");
 				}
-				tu.setEtat(ConstantEtat.ETAT_LIBRE);
+				tu.setEtat(ConstantEtat.ETAT_TABLE_LIBRE);
 			}
 			DaoModele.getInstance().update(toup,conn,"");
 			conn.commit();
@@ -197,7 +197,7 @@ public class TableAction extends Action {
 			}
 			for(Table tu:toup)
 			{
-				if(tu.getEtat()==ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_LIBRE){
+				if(tu.getEtat()==ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_TABLE_LIBRE){
 					throw new Exception("Impossible de transferer une table qui n'a aucun commande en cour");
 				}
 			}

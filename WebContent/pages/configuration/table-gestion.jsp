@@ -21,9 +21,10 @@
 	out.print(builder.getHTMLWithCheckbox("id"));
 %>
 <div class="form-group col-lg-12" style="text-align:right;">
+	<input type="hidden" name="iddesination" id="iddesination-multiple"/>
 	<input type="submit" value="Occuper" data="table-occuper" id="occuperbouton" class="btn btn-primary btn-xs"/>
 	<input type="submit" value="Liberer" data="table-liberer" class="btn btn-success btn-xs" id="libererbouton"/>
-	<input type="submit" value="Transferer" data="table-transferer" class="btn btn-warning btn-xs" id="transfererbouton"/>
+	<a href="javascript:;" data="table-transferer" class="btn btn-warning btn-xs" id="transfererbouton">Transferer</a>
 </div>
 </form>
 <%
@@ -37,6 +38,34 @@
 </div>
 <div class="panel-body form-horizontal style-form" >
 <div class="cl-lg-12" id="tableEmpl">
+</div>
+<div class="modal fade" id="transfert" style="margin-top:100px;margin-left:100px;">
+	<div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" style="color: white;" aria-label="Close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">x</span>
+                </button>
+                <h4>Transferer vers la table : </h4>
+            </div>
+            <div class="modal-body">
+            <%
+            for(Table t:data){
+            %>
+                <p><input type="radio" name="selected-table"> <%=t.getNom() %></p>
+            <%
+            }
+            %>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="col-lg-12">
+                <input type="submit" class="btn btn-primary btn-xs" name="confirme"  value="Confirmer"/>
+			<a class="btn btn-warning btn-xs closes"  href="javascript:;">Annuler</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <style>
 .selected td{
@@ -55,9 +84,24 @@
 		<input type="submit" value="Valider les places"/>
 	</form>
 </div>
+<form id="form-transfert" action="table-transferer" method="post" style="display: none;">
+	<input name="iddesination" id="iddesination-simple" type="hidden"/>
+	<input name="id" id="idtable-simple" type="hidden"/>
+</form>
 	<script src="assets/js/gestionnaires-table.js"></script>
 	<script src="assets/js/jquery.min.js"></script>
 	<script>
+	var afterSelectSimple=function(idtable)
+	{
+		$("#iddesination-simple").prop("value",idtable);
+		$("#form-transfert").submit();
+	}
+	var afterSelectMultiple=function(idtable)
+	{
+		$("#iddesination-multiple").prop("value",idtable);
+		$("#action-multiple").submit();
+	}
+	var selectedFunct=null;
 	$(document).ready(function () {
 		var tables = [];
 		<%for(int i=0;i<data.size();i++){
@@ -73,9 +117,31 @@
 		$("input.btn").on("click",function(){
 			$("#action-multiple").attr("action",$(this).attr("data"));
 		});
-		
+		$(".close").on("click",function(){
+			$(this).parents(".modal").prop("class","modal fade");
+		});
+		$(".closes").on("click",function(){
+			$(this).parents(".modal").prop("class","modal fade");
+		});
+		$("#transfererbouton").on("click",function(){
+			selectedFunct=afterSelectMultiple;
+			$("#action-multiple").attr("action",$(this).attr("data"));
+			$("#transfert").prop("class","modal show");
+		});
+		$("[name='transfertsimple']").on("click",function(){
+			selectedFunct=afterSelectSimple;
+			$("#idtable-simple").prop("value",$(this).attr("data"));
+			$("#action-multiple").attr("action",$("#transfererbouton").attr("data"));
+			$("#transfert").prop("class","modal show");
+		});
+		$("[name='confirme']").on("click",function(){
+			$("#transfert").prop("class","modal fade");
+			selectedFunct(2);
+		});
 	});
+	
 	</script>
 </div>
 </div>
 </div>
+

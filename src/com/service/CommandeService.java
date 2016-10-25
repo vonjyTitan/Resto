@@ -48,7 +48,7 @@ public class CommandeService {
 		}
 	}
 	public void annulerMenu(AnnulationMenu annulation,Connection conn)throws Exception{
-	
+		
 		DaoModele.getInstance().save(annulation, conn);
 		calculeQuantiteAnnuler(annulation.getIdcommande_menu(), conn);
 		
@@ -146,9 +146,55 @@ public class CommandeService {
 				annulation.setDate(new java.sql.Date(UtileAffichage.getDateNow().getTime()));
 				annulerMenu(annulation, conn);
 			}
-			DaoModele.getInstance().executeUpdate("update table_liste set etat="+ConstantEtat.ETAT_OCCUPER_SANS_COMMANDE+" where idtable in (select idtable from commande_ensemble_table where idensemble="+idensemble+") ", conn);
-			DaoModele.getInstance().executeUpdate("update commande set etat=2 where idensemble="+idensemble, conn);
+			DaoModele.getInstance().executeUpdate("update table_liste set etat="+ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE+" where idtable in (select idtable from commande_ensemble_table where idensemble="+idensemble+") ", conn);
+			DaoModele.getInstance().executeUpdate("update commande set etat="+ConstantEtat.ETAT_COMMANDE_ANNULER+" where idensemble="+idensemble, conn);
 			
+			conn.commit();
+		}
+		catch(Exception ex){
+			if(conn!=null)
+				conn.rollback();
+			throw ex;
+		}
+		finally{
+			if(conn!=null)
+				conn.close();
+		}
+	}
+	public void jumellerCommande(int destination,int idensemble,Connection conn) throws Exception{
+		//TODO save in notification that the commande was jummelled
+		Commande crit=new Commande();
+		crit.setIdensemble(idensemble);
+		List<Commande> coms=DaoModele.getInstance().findPageGenerique(1,crit,conn,"");
+		if(coms.get(0).getEtat()!=ConstantEtat.ETAT_COMMANDE_EN_COUR){
+			throw new Exception("L ensemble numero "+idensemble+" n est plus en cour");
+		}
+		DaoModele.getInstance().executeUpdate("update commande set idensemble="+destination+" where idensemble="+idensemble+" ",conn);
+		DaoModele.getInstance().executeUpdate("update commande_ensemble_table set idensemble="+destination+" where idensemble="+idensemble+" ",conn);
+		
+	}
+	public void jumellerCommande(int destination,int []idensembles,Connection conn) throws Exception{
+		for(int idensemble : idensembles){
+			jumellerCommande(destination,idensemble,conn);
+		}
+	}
+	public void jumellerCommande(int[] idensembles) throws Exception{
+		Connection conn=null;
+		try{
+			conn=Connecteur.getConnection();
+			conn.setAutoCommit(false);
+			int dest=idensembles[0];
+			
+			List<Commande> coms=DaoModele.getInstance().findPageGenerique(1,new Commande(),conn," and idensemble="+dest);
+			if(coms.get(0).getEtat()!=ConstantEtat.ETAT_COMMANDE_EN_COUR){
+				throw new Exception("L ensemble numero "+dest+" n est plus en cour");
+			}
+			
+			int[]from=new int[idensembles.length-1];
+			for(int i=1;i<idensembles.length;i++){
+				from[i-1]=idensembles[i];
+			}
+			jumellerCommande(dest,from,conn);
 			conn.commit();
 		}
 		catch(Exception ex){
