@@ -12,6 +12,7 @@ import com.affichage.HTMLBuilder;
 import com.mapping.ConstantEtat;
 import com.mapping.Table;
 import com.rooteur.Action;
+import com.service.TableService;
 
 import dao.Connecteur;
 import dao.DaoModele;
@@ -187,21 +188,19 @@ public class TableAction extends Action {
 			conn.setAutoCommit(false);
 			
 			String[] id=request.getParameterValues("id");
+			String destination=SessionUtil.getValForAttr(request, "iddesination");
 			if(id==null || id.length==0){
 				throw new Exception("Aucune table selectinner");
 			}
-			String inter=Utilitaire.concatListe(id, ",", "");
-			List<Table> toup=DaoModele.getInstance().findPageGenerique(1,new Table(),conn," and idtable in ("+inter+") ");
-			if(toup.size()!=id.length){
-				throw new Exception("Table introuvable");
+			if(destination==null || destination==""){
+				throw new Exception("Aucune table destination selectionner");
 			}
-			for(Table tu:toup)
-			{
-				if(tu.getEtat()==ConstantEtat.ETAT_TABLE_OCCUPER_SANS_COMMANDE || tu.getEtat()==ConstantEtat.ETAT_TABLE_LIBRE){
-					throw new Exception("Impossible de transferer une table qui n'a aucun commande en cour");
-				}
+			int taille=id.length;
+			Integer [] idint=new Integer[taille];
+			for(int i=0;i<taille;i++){
+				idint[i]= Integer.valueOf(id[i]);
 			}
-		//TRANSFERER
+		TableService.getInstance().transfererTable(idint, Integer.valueOf(destination));
 		goTo(request,response,"get","main.jsp?cible=configuration/table-gestion");
 	}
 	catch(Exception ex){

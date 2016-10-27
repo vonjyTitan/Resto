@@ -18,6 +18,7 @@ public class Commande extends DataEntity {
 	private int idensemble;
 	private int lastensemble;
 	private int etat;
+	private int idtableassi;
 	public String getTable_liste() {
 		return table_liste;
 	}
@@ -80,6 +81,12 @@ public class Commande extends DataEntity {
 		if(etat==1)
 			return "Active";
 		return "Annulée";
+	}
+	public int getIdtableassi() {
+		return idtableassi;
+	}
+	public void setIdtableassi(int idtableassi) {
+		this.idtableassi = idtableassi;
 	}
 	
 }

@@ -61,6 +61,7 @@ public class CommandeAction extends Action {
 			comm.setIdensemble(idEnsemble);
 			comm.setLastensemble(idEnsemble);
 			comm.setNbPersonnes(client);
+			comm.setIdtableassi(t.getIdtable());
 			comm.setDaty(new java.sql.Date(UtileAffichage.getDateNow().getTime()));
 			DaoModele.getInstance().save(comm, conn);
 			

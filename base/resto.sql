@@ -453,6 +453,7 @@ CREATE TABLE IF NOT EXISTS `commande` (
   PRIMARY KEY (`idcommande`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 ALTER TABLE `commande` ADD `etat` INT NULL DEFAULT '1';
+ALTER TABLE `commande` ADD `idtableassi` INT NOT NULL AFTER `lastensemble` ;
 -- --------------------------------------------------------
 
 --

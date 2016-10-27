@@ -52,7 +52,7 @@
             <%
             for(Table t:data){
             %>
-                <p><input type="radio" name="selected-table"> <%=t.getNom() %></p>
+                <p><input type="radio" name="selected-table" value="<%=t.getIdtable()%>"> <%=t.getNom() %></p>
             <%
             }
             %>
@@ -136,7 +136,7 @@
 		});
 		$("[name='confirme']").on("click",function(){
 			$("#transfert").prop("class","modal fade");
-			selectedFunct(2);
+			selectedFunct($("input:radio[name='selected-table']:checked").val());
 		});
 	});
 	
